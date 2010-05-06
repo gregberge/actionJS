@@ -296,13 +296,6 @@ aj.DisplayObject = function(params)
         this._width = Number(val);
         
         if(this._width < 0){ this._width = 0; }
-        else
-        {
-        	if(parent.width < this.width)
-        	{
-        		parent.width = this.width;
-        	}
-        }
     });
     
 	
@@ -329,13 +322,6 @@ aj.DisplayObject = function(params)
         this._height = Number(val);
         
         if(this._height < 0){ this._height = 0; }
-        else
-        {
-        	if(parent.height < this.height)
-        	{
-        		parent.height = this.height;
-        	}
-        }
     });
 	
 	/**
@@ -597,6 +583,11 @@ aj.DisplayObjectContainer = function()
 	
 	this.children = [];
 	
+	this.left = 0;
+	this.right = 0;
+	this.top = 0;
+	this.bottom = 0;
+	
 	/**
 	 * Getter numChildren
 	 * @returns {number} children number
@@ -607,6 +598,48 @@ aj.DisplayObjectContainer = function()
 };
 
 aj.DisplayObjectContainer.prototype = new aj.DisplayObject;
+
+/**
+ * Automatic resize of the container
+ * @returns {void}
+ */
+aj.DisplayObjectContainer.prototype.autoResize = function(child)
+{
+	if(this.numChildren)
+	{
+		var left = this.children[0].x;
+		var right = this.children[0].x + this.children[0].width;
+		
+		var top = this.children[0].y;
+		var bottom = this.children[0].y + this.children[0].height;
+		
+		for (var i=0, il=this.children.length; i<il; i++)
+		{
+			if(this.children[i].x < left)
+			{
+				left = this.children[i].x;
+			}
+			
+			if(this.children[i].x + this.children[i].width > right)
+			{
+				right = this.children[i].x + this.children[i].width;
+			}
+			
+			if(this.children[i].y < top)
+			{
+				top = this.children[i].y;
+			}
+			
+			if(this.children[i].y + this.children[i].height > bottom)
+			{
+				bottom = this.children[i].y + this.children[i].height;
+			}
+		}
+		
+		this._width = right - left;
+		this._height = bottom - top;
+	}
+};
 
 /**
  * Add a displayObject in the container
@@ -673,6 +706,8 @@ aj.DisplayObjectContainer.prototype.addChildAt = function(child, index)
 				this.setChildStage(child);
 			}
 		}
+		
+		this.autoResize();
 		
 		return child;
 	}

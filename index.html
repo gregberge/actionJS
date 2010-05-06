@@ -50,9 +50,17 @@ var displayObjectContainer = new aj.DisplayObjectContainer();
 displayObjectContainer.x = 200;
 displayObjectContainer.y = 200;
 displayObjectContainer.name = "container";
- 
+
+
+
 displayObject.addChild(imageObject);
+
+console.log(displayObjectContainer.width);
+
 displayObjectContainer.addChild(displayObject);
+
+console.log(displayObjectContainer.width);
+
 displayObject.mouseEnabled = true;
 displayObject.name = "dispobj";
  
