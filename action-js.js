@@ -1,31 +1,76 @@
+/**
+ * Action JS base object
+ * @author Greg Bergé
+ * @namespace The base namespace of actionJS library
+ */
 aj  = {};
 
-
+/**
+ * Point representation
+ * @class Represents a point.
+ * @param [x=0] {number} The absciss coord of the point
+ * @param [y=0] {number} The ordonnee coord of the point
+ */
 aj.Point = function(x, y)
 {
+	/**
+     * The absciss coord of the point
+     * @type number
+     */
 	this.x = x;
+	
+	/**
+     * The ordonnee coord of the point
+     * @type number
+     */
 	this.y = y;
+	
+	if(this.x == null){ this.x = 0; }
+	if(this.y == null){ this.y = 0; }
 };
 
-aj.Point.prototype.x = null;
 
-aj.Point.prototype.y = null;
-
-
-
+/**
+ * Event base class
+ * @class Represents an event.
+ * @param {string} type Event type
+ */
 aj.Event = function(type)
 {
+	/**
+     * The type of the event
+     * @type string
+     */
 	this.type = type;
+	
+	/**
+     * The target of the event
+     * @type aj.EventDispatcher
+     */
+	this.target = {};
+	
+	/**
+     * The current target of the event
+     * @type aj.EventDispatcher
+     */
+	this.currentTarget = {};
 };
 
-aj.Event.prototype.currentTarget = {};
-
-aj.Event.prototype.target = {};
-
-aj.Event.prototype.type = "";
-
+/**
+ * Enter frame event type
+ * @public
+ * @static
+ * @type string
+ */
 aj.Event.ENTER_FRAME = "enter_frame";
 
+
+/**
+ * Event base class
+ * @class Represents an event.
+ * @extends aj.Event 
+ * @param {string} type Event type
+ */
 aj.MouseEvent = function(type)
 {
 	this.super = aj.Event;
@@ -34,38 +79,79 @@ aj.MouseEvent = function(type)
 
 aj.MouseEvent.prototype = new aj.Event;
 
+/**
+ * Click event type
+ * @public
+ * @static
+ * @type string
+ */
 aj.MouseEvent.CLICK = "click";
 
 
-
+/**
+ * Event dispatcher
+ * @class Dispatch and listen events.
+ */
 aj.EventDispatcher = function()
 {
 	this.eventListenerList = [];
 };
 
-aj.EventDispatcher.prototype.eventListenerList = [];
-
+/**
+ * Add a listener of an specific event type on the object
+ * @public
+ * @param {string} type The event type
+ * @param {function} listener The function to call
+ * @returns {boolean} true if correctly added, else false
+ */
 aj.EventDispatcher.prototype.addEventListener = function(type, listener)
 {
-	eventListener = [type, listener];
-	this.eventListenerList.push(eventListener);
+	if(type && listener)
+	{
+		var eventListener = [type, listener];
+		this.eventListenerList.push(eventListener);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 };
 
+/**
+ * Dispatch a specific event on the object
+ * @public
+ * @param {aj.Event} event The event to dispatch
+ * @returns {boolean} true if correctly dispatched, else false
+ */
 aj.EventDispatcher.prototype.dispatchEvent = function(event)
 {	
-	for (var i=0, il=this.eventListenerList.length; i<il; i++)
+	if(event)
 	{
-    	var eventListener = this.eventListenerList[i];
-    	
-    	if(eventListener[0] == event.type)
-    	{
-    		eventListener[1].call(this, event);
-    	}
+		for (var i=0, il=this.eventListenerList.length; i<il; i++)
+		{
+	    	var eventListener = this.eventListenerList[i];
+	    	
+	    	if(eventListener[0] == event.type)
+	    	{
+	    		eventListener[1].call(this, event);
+	    	}
+		}
+		
+		return true;
 	}
-	
-	return true;
+	else
+	{
+		return false;
+	}
 };
 
+/**
+ * Test if the object listen a specific event type
+ * @public
+ * @param {string} type The event type
+ * @returns {boolean} true if the object has the listener, else false
+ */
 aj.EventDispatcher.prototype.hasEventListener = function(type)
 {
 	for (var i=0, il=this.eventListenerList.length; i<il; i++)
@@ -81,8 +167,16 @@ aj.EventDispatcher.prototype.hasEventListener = function(type)
 	return false;
 };
 
+/**
+ * Remove an event listener
+ * @param {string} type The event type
+ * @param {function} listener The event listener
+ * @return {boolean} true if an event was removed, else false
+ */
 aj.EventDispatcher.prototype.removeEventListener = function(type, listener)
 {
+	var removed = false;
+	
 	for (var i=0, il=this.eventListenerList.length; i<il; i++)
 	{
     	var eventLister = this.eventListenerList[i];
@@ -90,10 +184,19 @@ aj.EventDispatcher.prototype.removeEventListener = function(type, listener)
     	if(eventListener[0] == type && eventListener[1] == listener)
     	{
     		this.eventListenerList.splice(i, 1);
+    		removed = true;
     	}
 	}
+	
+	return removed;
 };
 
+/**
+ * The same function as hasEventListener
+ * @see aj.EventDispatcher#hasEventListener
+ * @param type
+ * @return {boolean} true if the object has the listener, else false
+ */
 aj.EventDispatcher.prototype.willTriger = function(type)
 {
 	return this.hasEventListener(type);
