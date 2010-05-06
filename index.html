@@ -49,9 +49,22 @@ displayObjectContainer.x = 200;
 displayObjectContainer.y = 200;
 displayObjectContainer.name = "container";
 
+var images = [];
 
+for(var i = 1; i < 50; i++)
+{
+	var imageObject = new aj.Image("http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+	imageObject.height = 50;
+	imageObject.width = 50;
+	imageObject.x = 20;
+	imageObject.y = Math.random()*300;
+	
+	imageObject.speed = Math.random()*20;
+	
+	displayObject.addChild(imageObject);
 
-displayObject.addChild(imageObject);
+	images.push(imageObject);
+}
 
 //console.log(displayObjectContainer.width);
 
@@ -64,15 +77,19 @@ displayObject.name = "dispobj";
  
 function moveImage()
 {
-	if(imageObject)
+	for(var i = 0; i < images.length; i++)
 	{
-		if(imageObject.x < 300)
+		var imageObject = images[i];
+		if(imageObject)
 		{
-			imageObject.x = imageObject.x + 1;
-		}
-		else
-		{
-			imageObject.x = 20;
+			if(imageObject.x < 300)
+			{
+				imageObject.x = imageObject.x + imageObject.speed;
+			}
+			else
+			{
+				imageObject.x = 20;
+			}
 		}
 	}
 };
