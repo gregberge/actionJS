@@ -179,7 +179,7 @@ aj.EventDispatcher.prototype.removeEventListener = function(type, listener)
 	
 	for (var i=0, il=this.eventListenerList.length; i<il; i++)
 	{
-    	var eventLister = this.eventListenerList[i];
+    	var eventListener = this.eventListenerList[i];
     	
     	if(eventListener[0] == type && eventListener[1] == listener)
     	{
@@ -207,152 +207,276 @@ aj.EventDispatcher.prototype.willTriger = function(type)
 
 
 
-
-aj.DisplayObject = function()
+/**
+ * Display object
+ * @class Represents an object that can be displayed.
+ * @extends aj.EventDispatcher
+ * @param {object} [params] The parameters links to the object
+ */
+aj.DisplayObject = function(params)
 {
 	this.super = aj.EventDispatcher;
 	this.super();
 	
-	this.parent = null;
+	/**
+	 * The parent of the display object
+	 * @private
+	 * @type aj.DisplayObjectContainer
+	 */
+	this._parent = null;
+	
+	/**
+	 * The absciss coord of the object
+	 * @private
+	 * @default 0
+	 * @type number
+	 */
 	this._x = 0;
-	this._y = 0;
-	this.mouseX = 0;
-	this.mouseY = 0;
-	this._width = 0;
-	this._height = 0;
-	this._alpha = 1;
-	this._visible = true;
-	this.stage = null;
 	
-	this.name = "displayObject_" + aj.DisplayObject.Id;
-	aj.DisplayObject.Id++;
-	
+	/**
+	 * Getter x
+	 * @returns {number} _x
+	 */
 	this.__defineGetter__("x", function(){
         return this._x;
     });
     
+	/**
+	 * Setter x
+	 */
     this.__defineSetter__("x", function(val){
-        this._x = val;
-		//this.jqEl.css("left", Math.round(this._x));
+        this._x = Number(val);
     });
     
-    this.__defineGetter__("y", function(){
+	
+	/**
+	 * The ordonnee of the object
+	 * @private
+	 * @default 0
+	 * @type number
+	 */
+	this._y = 0;
+	
+	/**
+	 * Getter y
+	 * @returns {number} _y
+	 */
+	this.__defineGetter__("y", function(){
         return this._y;
     });
     
+	/**
+	 * Setter y
+	 */
     this.__defineSetter__("y", function(val){
-        this._y = val;
-		//this.jqEl.css("top", Math.round(this._y));
+        this._y = Number(val);
     });
     
-    this.__defineGetter__("alpha", function(){
-        return this._alpha;
-    });
-    
-    this.__defineSetter__("alpha", function(val)
-    {
-        this._alpha = val;
-        
-        if(this._alpha < 0)
-        {
-        	this._alpha = 0;
-        }
-    });
-    
-    this.__defineGetter__("width", function(){
+	
+	/**
+	 * The width of the object
+	 * @private
+	 * @default 0
+	 * @type number
+	 */
+	this._width = 0;
+	
+	/**
+	 * Getter width
+	 * @returns {number} _width
+	 */
+	this.__defineGetter__("width", function(){
         return this._width;
     });
     
+	/**
+	 * Setter width
+	 */
     this.__defineSetter__("width", function(val){
-        this._width = val;
-		//this.jqEl.css("width", this._width);
+        this._width = Number(val);
+        
+        if(this._width < 0){ this._width = 0; }
+        else
+        {
+        	if(parent.width < this.width)
+        	{
+        		parent.width = this.width;
+        	}
+        }
     });
     
-    this.__defineGetter__("height", function(){
+	
+	/**
+	 * The height of the object
+	 * @private
+	 * @default 0
+	 * @type number
+	 */
+	this._height = 0;
+	
+	/**
+	 * Getter height
+	 * @returns {number} _height
+	 */
+	this.__defineGetter__("height", function(){
         return this._height;
     });
     
+	/**
+	 * Setter height
+	 */
     this.__defineSetter__("height", function(val){
-        this._height = val;
-		//this.jqEl.css("height", this._height);
+        this._height = Number(val);
+        
+        if(this._height < 0){ this._height = 0; }
+        else
+        {
+        	if(parent.height < this.height)
+        	{
+        		parent.height = this.height;
+        	}
+        }
+    });
+	
+	/**
+	 * The opacity of the object (0 to 1)
+	 * @private
+	 * @default 1
+	 * @type number
+	 */
+	this._alpha = 1;
+	
+	/**
+	 * Getter alpha
+	 * @returns {number} _alpha
+	 */
+	this.__defineGetter__("alpha", function(){
+        return this._alpha;
     });
     
-    this.__defineGetter__("visible", function(){
+	/**
+	 * Setter alpha
+	 */
+    this.__defineSetter__("alpha", function(val)
+    {
+        this._alpha = Number(val);
+        
+        if(this._alpha < 0){ this._alpha = 0; }
+    });
+	
+	/**
+	 * Display the object of not
+	 * @private
+	 * @default true
+	 * @type boolean
+	 */
+	this._visible = true;
+	
+	/**
+	 * Getter visible
+	 * @returns {number} _alpha
+	 */
+	this.__defineGetter__("visible", function(){
         return this._visible;
     });
     
-    this.__defineSetter__("visible", function(val){
-        this._visible = val;
-        
-        
-		if(val)
-		{
-			this.jqEl.hide();
-		}
-		else
-		{
-			this.jqEl.show();
-		}
+	/**
+	 * Setter visible
+	 */
+    this.__defineSetter__("visible", function(val)
+    {
+        this._visible = Boolean(val);
+    });
+	
+	/**
+	 * The stage of the object
+	 * @private
+	 * @default null
+	 * @type aj.Stage
+	 */
+	this._stage = null;
+	
+	/**
+	 * Getter stage
+	 * @returns {aj.Stage} _stage
+	 */
+	this.__defineGetter__("stage", function(){
+        return this._stage;
     });
     
-    this.__defineGetter__("mouseEnabled", function(){
-        return this._mouseEnabled;
+	/**
+	 * Setter stage
+	 */
+    this.__defineSetter__("stage", function(val)
+    {
+    	if(val instanceof aj.Stage)
+    	{
+    		this._stage = val;
+    	}
+    });
+	
+	/**
+	 * The name of the object
+	 * @private
+	 * @default "displayObject_" + currentId
+	 * @type string
+	 */
+	this._name = "displayObject_" + aj.DisplayObject.Id;
+	
+	/**
+	 * Getter name
+	 * @returns {string} _name
+	 */
+	this.__defineGetter__("name", function(){
+        return this._name;
     });
     
-    this.__defineSetter__("mouseEnabled", function(val){
-        this._mouseEnabled = val;
-        
-        
-		if(val)
-		{
-			//this.jqEl.mousemove(jQuery.proxy(this, "updateMouse"));
-		}
-		else
-		{
-			//this.jqEl.unbind("mousemove", this.updateMouse);
-		}
+	/**
+	 * Setter name
+	 */
+    this.__defineSetter__("name", function(val)
+    {
+    	this._name = val + "";
     });
+    
+    //Increment static id
+	aj.DisplayObject.Id++;
 };
 
 aj.DisplayObject.prototype = new aj.EventDispatcher;
 
+/**
+ * Id of each displayObject
+ * @static
+ * @type number
+ */
 aj.DisplayObject.Id = 0;
 
-aj.DisplayObject.prototype.name = "";
-
-aj.DisplayObject.prototype.mouseX = 0;
-
-aj.DisplayObject.prototype.mouseY = 0;
-
-aj.DisplayObject.prototype._x = 0;
-
-aj.DisplayObject.prototype._y = 0;
-
-aj.DisplayObject.prototype._width = 0;
-
-aj.DisplayObject.prototype._height = 0;
-
-aj.DisplayObject.prototype._alpha = 1;
-
-aj.DisplayObject.prototype._visible = true;
-
-aj.DisplayObject.prototype._mouseEnabled = false;
-
-aj.DisplayObject.prototype.stage = null;
-
-aj.DisplayObject.prototype.parent = null;
-
-aj.DisplayObject.prototype.jqEl = {};
-
+/**
+ * Get the point with object coords
+ * @public
+ * @returns {aj.Point} The coord point
+ */
 aj.DisplayObject.prototype.getCoordPoint = function()
 {
 	return new aj.Point(this.x, this.y);
 };
 
+/**
+ * Convert a point from local coords to stage coords
+ * @public
+ * @param {aj.Point} [localPoint=DisplayObject#getCoordPoint] The local point
+ * @returns {aj.Point|boolean} The coord point or false if no parent
+ */
 aj.DisplayObject.prototype.localToGlobal = function(localPoint)
 {
-	if(this.parent)
+	//Check if there is a parent to the object
+	if(this.parent instanceof aj.DisplayObjectContainer)
 	{
+
+		//Default value
+		if(localPoint == null){ localPoint = this.getCoordPoint(); }
+		
 		var globalPoint = new aj.Point();
 		var parent = this.parent;
 		
@@ -372,10 +496,16 @@ aj.DisplayObject.prototype.localToGlobal = function(localPoint)
 	return false;
 };
 
+/**
+ * Check if the object hit a stage point
+ * @public
+ * @param {aj.Point} point The point to hit
+ * @returns {boolean} true if the object hit the point, else false
+ */
 aj.DisplayObject.prototype.hitTestPoint = function(point)
 {
-	var globalPoint = this.localToGlobal(this.getCoordPoint());
-	
+	var globalPoint = this.localToGlobal();
+
 	if(point.x > globalPoint.x && point.x < globalPoint.x + this.width)
 	{
 		if(point.y > globalPoint.y && point.y < globalPoint.y + this.height)
@@ -387,29 +517,37 @@ aj.DisplayObject.prototype.hitTestPoint = function(point)
 	return false;
 };
 
+/**
+ * The mouse test call at mouse action on the stage
+ * @private
+ * @param {aj.Point} point The current mouse point
+ * @param {aj.MouseEvent} mouseEvent The mouse event
+ * @returns {void}
+ */
 aj.DisplayObject.prototype.mouseTest = function(point, mouseEvent)
 {	
+	//If object under mouse point, we dispatch the corresponding event
 	if(this.hitTestPoint(point))
 	{
 		this.dispatchEvent(mouseEvent);
-	}
-	
-	if(this.children)
-	{
-		for (var i=0, il=this.children.length; i<il; i++)
+		
+		//If it's a displayObjectContainer with children
+		if(this.children)
 		{
-			this.children[i].mouseTest(point, mouseEvent);
+			//Forward the function to children
+			for (var i=0, il=this.children.length; i<il; i++)
+			{
+				this.children[i].mouseTest(point, mouseEvent);
+			}
 		}
 	}
 };
 
-aj.DisplayObject.prototype.updateMouse = function(e)
-{
-	var offset = this.jqEl.offset();
-	this.mouseX = e.pageX - offset.left;
-	this.mouseY = e.pageY - offset.top;
-};
-
+/**
+ * Draw the object on the stage
+ * @private
+ * @returns {void}
+ */
 aj.DisplayObject.prototype.draw = function()
 {
 	this.preDraw();
@@ -417,15 +555,28 @@ aj.DisplayObject.prototype.draw = function()
 	this.postDraw();
 };
 
+/**
+ * Executed before the drawing
+ * @private
+ * @returns {void}
+ */
 aj.DisplayObject.prototype.preDraw = function()
 {
 	this.stage.context2D.globalAlpha = this.alpha;
 };
 
+/**
+ * The drawing method
+ * @returns {void}
+ */
 aj.DisplayObject.prototype.drawBase = function()
 {
 };
 
+/**
+ * Executed after the drawing
+ * @returns {void}
+ */
 aj.DisplayObject.prototype.postDraw = function()
 {
 	this.stage.context2D.globalAlpha = 1;
@@ -434,58 +585,53 @@ aj.DisplayObject.prototype.postDraw = function()
 
 
 
-
+/**
+ * Display Object Container
+ * @extends aj.DisplayObject
+ * @class Represents a display object that can contains others.
+ */
 aj.DisplayObjectContainer = function()
 {
 	this.super = aj.DisplayObject;
 	this.super();
 	
 	this.children = [];
+	
+	/**
+	 * Getter numChildren
+	 * @returns {number} children number
+	 */
+	this.__defineGetter__("numChildren", function(){
+        return this.children.length;
+    });
 };
 
 aj.DisplayObjectContainer.prototype = new aj.DisplayObject;
 
-aj.DisplayObjectContainer.prototype.children = [];
-
-aj.DisplayObjectContainer.prototype.numChildren = function()
-{
-	return this.children.length;
-};
-
+/**
+ * Add a displayObject in the container
+ * @public
+ * @see aj.DisplayObjectContainer#addChildAt
+ * @param {aj.DisplayObject} child
+ * @returns {aj.DisplayObject|boolean} The display object or false if not a valid display object
+ */
 aj.DisplayObjectContainer.prototype.addChild = function(child)
 {	
-	if(!this.contains(child))
-	{
-		if(child.parent != null)
-		{
-			child.parent.removeChild(child);
-		}
-		
-		//aj part
-		this.children.push(child);
-		child.parent = this;
-		
-		child.stage = this.stage;
-		this.setChildStage(child);
-	
-		//jquery part
-		//this.jqEl.append(child.jqEl);
-		//child.jqEl.css("z-index", this.numChildren() - 1);
-	}
-	
-	return child;
+	return this.addChildAt(child, 0);
 };
 
-aj.DisplayObjectContainer.prototype.setChildStage = function(child)
-{
-};
-
+/**
+ * Set the child for all children
+ * @private
+ * @returns {void}
+ */
 aj.DisplayObjectContainer.prototype.setAllChildStage = function()
 {	
 	for (var i=0, il=this.children.length; i<il; i++)
 	{
 		this.children[i].stage = this.stage;
 		
+		//If children, we forward
 		if(this.children[i].children)
 		{
     		this.children[i].setAllChildStage();
@@ -493,30 +639,53 @@ aj.DisplayObjectContainer.prototype.setAllChildStage = function()
 	}
 };
 
+/**
+ * Add a child at a specific place
+ * @public
+ * @param {aj.DisplayObject} child The child
+ * @param {number} index The index 
+ * @returns {aj.DisplayObject|boolean} The display object or false if not a valid display object
+ */
 aj.DisplayObjectContainer.prototype.addChildAt = function(child, index)
 {
-	if(this.getChildIndex(child) != index)
+	//If it's a valid display object
+	if(child instanceof aj.DisplayObject && index == 0 || (index < this.numChildren && index >= 0))
 	{
-		if(child.parent != null)
+		//If the child not also in this container
+		if(this.getChildIndex(child) !== index)
 		{
-			child.parent.removeChild(child);
+			//If the child is in other container, we remove it
+			if(child.parent != null)
+			{
+				child.parent.removeChild(child);
+			}
+			
+			//Add in the children array
+			this.children.splice(index, 0, child);
+			
+			//Set the parent and the stage
+			child.parent = this;
+			child.stage = this.stage;
+			
+			//For a stage we forward the parent
+			if(this instanceof aj.Stage)
+			{
+				this.setChildStage(child);
+			}
 		}
 		
-		//aj part
-		this.children.splice(index, 0, child);
-		child.parent = this;
-		
-		child.stage = this.stage;
-		this.setChildStage(child);
-	
-		//jquery part
-		this.jqEl.append(child.jqEl);
-		//child.jqEl.css("z-index", index);
+		return child;
 	}
 	
-	return child;
+	return false;
 };
 
+/**
+ * Test if a child is in the container
+ * @public
+ * @param {aj.DisplayObject} child The child to test
+ * @returns {boolean} true if it contains the child, else false
+ */
 aj.DisplayObjectContainer.prototype.contains  = function(child)
 {
 	for (var i=0, il=this.children.length; i<il; i++)
@@ -530,14 +699,29 @@ aj.DisplayObjectContainer.prototype.contains  = function(child)
 	return false;
 };
 
+/**
+ * Get a child at a specific index
+ * @public
+ * @param {number} index The child index
+ * @returns {aj.DisplayObject|boolean} The child or false if index out of bounds
+ */
 aj.DisplayObjectContainer.prototype.getChildAt = function(index)
 {
-	if(index < this.numChildren() && index >= 0)
+	if(index < this.numChildren && index >= 0)
 	{
 		return this.children[index];
 	}
+	
+	return false;
 };
 
+/**
+ * Get a child by his name
+ * @deprecated
+ * @public
+ * @param {string} name The name of the child
+ * @returns {aj.DisplayObject|boolean} The child if find else false
+ */
 aj.DisplayObjectContainer.prototype.getChildByName = function(name)
 {
 	for (var i=0, il=this.children.length; i<il; i++)
@@ -551,6 +735,12 @@ aj.DisplayObjectContainer.prototype.getChildByName = function(name)
 	return false;
 };
 
+/**
+ * Get the index of a child
+ * @public
+ * @param {aj.DisplayObject} child The child to get the index
+ * @return {number|boolean} The index or false if not find
+ */
 aj.DisplayObjectContainer.prototype.getChildIndex = function(child)
 {
 	for (var i=0, il=this.children.length; i<il; i++)
@@ -561,9 +751,15 @@ aj.DisplayObjectContainer.prototype.getChildIndex = function(child)
     	}
 	}
 	
-	return -1;
+	return false;
 };
 
+/**
+ * Remove a child from the container
+ * @public
+ * @param {aj.DisplayObject} child The child to remove
+ * @returns {aj.DisplayObject} The child passed in param
+ */
 aj.DisplayObjectContainer.prototype.removeChild = function(child)
 {
 	for (var i=0, il=this.children.length; i<il; i++)
@@ -579,23 +775,30 @@ aj.DisplayObjectContainer.prototype.removeChild = function(child)
 	return child;
 };
 
+/**
+ * Set the index of a child
+ * @public
+ * @param {aj.DisplayObject} child The child to swap
+ * @param {number} index The new index of the child
+ * @returns {aj.DisplayObject} The child passed in param
+ */
 aj.DisplayObjectContainer.prototype.setChildIndex = function(child, index)
 {
-	if(this.contains(child) && index < this.numChildren() && index >= 0)
+	if(this.contains(child))
 	{
-		this.removeChild(child);
-		
-		//aj part
-		this.children.splice(index, 0, child);
-	
-		//jquery part
-		this.jqEl.append(child.jqEl);
-		//child.jqEl.css("z-index", index);
+		return this.addChildAt(child, index);
 	}
 	
-	return child;
+	return false;
 };
 
+/**
+ * Swap two children
+ * @public
+ * @param {aj.DisplayObject} child1 The first child
+ * @param {aj.DisplayObject} child2 The second child
+ * @returns {boolean} true if the swap is correctly done, else false
+ */
 aj.DisplayObjectContainer.prototype.swapChildren = function(child1, child2)
 {
 	if(this.contains(child1) && this.contains(child2))
@@ -604,79 +807,138 @@ aj.DisplayObjectContainer.prototype.swapChildren = function(child1, child2)
 		var index2 = this.getChildIndex(child2);
 		
 		this.children[index1] = child2;
-		//child2.jqEl.css("z-index", index1);
 		
 		this.children[index2] = child1;
-		//child1.jqEl.css("z-index", index2);
+		
+		return true;
 	}
+	
+	return false;
 };
 
+/**
+ * Swap children by index
+ * @public
+ * @param {number} index1 The index of the first child
+ * @param {number} index2 The index of the second child
+ * @returns {boolean} true if the swap is correctly done, else false
+ */
 aj.DisplayObjectContainer.prototype.swapChildrenAt = function(index1, index2)
 {
-	if(index1 < this.numChildren() && index1 >= 0 && index2 < this.numChildren() && index2 >= 0)
+	if(index1 < this.numChildren && index1 >= 0 && index2 < this.numChildren && index2 >= 0)
 	{
 		var child1 = this.children[index1];
 		var child2 = this.children[index2];
 		
 		this.children[index1] = child2;
-		//child2.jqEl.css("z-index", index1);
 		
 		this.children[index2] = child1;
-		//child1.jqEl.css("z-index", index2);
+		
+		return true;
 	}
+	
+	return false;
 };
 
+/**
+ * The draw method surcharge
+ * @returns {void}
+ */
 aj.DisplayObjectContainer.prototype.draw = function()
 {
+	this.preDraw();
+	
 	for (var i=0, il=this.children.length; i<il; i++)
 	{
     	this.children[i].draw();
     }
     
     this.drawBase();
+    
+    this.postDraw();
 };
 
 
-
+/**
+ * Stage
+ * @extends aj.DisplayObjectContainer
+ * @param {string} stageId The DOM id of the canvas
+ * @param {number} fps The fps of the stage
+ */
 aj.Stage = function(stageId, fps)
 {
 	this.super = aj.DisplayObjectContainer;
 	this.super();
 	
+	/**
+	 * The jQuery element
+	 * @private
+	 * @type object
+	 */
 	this.jqEl = jQuery("#" + stageId);
-	this.name = stageId;
 	
-	this.stage = this;
-	
+	/**
+	 * The 2D context of the canvas
+	 * @private
+	 * @type object
+	 */
 	this.context2D = null;
 	
-	if(fps != undefined)
-	{
-		this._fps = fps;
-	}
+	/**
+	 * The enter frame interval
+	 * @private
+	 * @type number
+	 */
+	this.enterFrameInterval = null;
 	
-	this.jqEl.get(0).addEventListener("click", jQuery.proxy(this.clickListener, this), false);
-		
-	this.initEnterFrame();
+	/**
+	 * The frame per second
+	 * @private
+	 * @default 150
+	 * @type number
+	 */
+	this._fps = 150;
 	
+	if(this._fps != null){ this.fps = fps; };
+	
+	/**
+	 * Getter fps
+	 * @returns {number}
+	 */
 	this.__defineGetter__("fps", function(){
 		return this._fps;
 	});
 
+	/**
+	 * Setter fps
+	 */
 	this.__defineSetter__("fps", function(val){
 		this._fps = val;
+		
+		if(this._fps < 1){ this._fps = 1; }
+		
 		this.initEnterFrame();
 	});
+	
+	
+	this.name = stageId;
+	this.stage = this;
+	this.parent = 'basepage';
+	
+	this.jqEl.get(0).addEventListener("click", jQuery.proxy(this.clickListener, this), false);
+		
+	this.initEnterFrame();
 };
 
 aj.Stage.prototype = new aj.DisplayObjectContainer;
 
-aj.Stage.prototype.context2D = null;
-
-aj.Stage.prototype.enterFrameInterval = 0;
-
-aj.Stage.prototype._fps = 150;
-
+/**
+ * The click listener
+ * @private
+ * @event
+ * @param {event} event The event
+ * @returns {void}
+ */
 aj.Stage.prototype.clickListener = function(event)
 {
 	var mouseEvent = new aj.MouseEvent(aj.MouseEvent.CLICK);
@@ -686,6 +948,11 @@ aj.Stage.prototype.clickListener = function(event)
 	this.mouseTest(point, mouseEvent);
 };
 
+/**
+ * Initialize enter frame
+ * @private
+ * @returns {void}
+ */
 aj.Stage.prototype.initEnterFrame = function()
 {
 	clearInterval(this.enterFrameInterval);
@@ -694,11 +961,21 @@ aj.Stage.prototype.initEnterFrame = function()
 	this.context2D = this.stage.jqEl.get(0).getContext('2d');
 };
 
+/**
+ * Stage forward
+ * @param {aj.DisplayObject} child The child
+ * @return {void}
+ */
 aj.Stage.prototype.setChildStage = function(child)
 {
 	child.setAllChildStage();
 };
 
+/**
+ * The main enterFrame function
+ * @event
+ * @returns {void}
+ */
 aj.Stage.prototype.enterFrame = function()
 {
 	var event = new aj.Event(aj.Event.ENTER_FRAME);
@@ -712,20 +989,41 @@ aj.Stage.prototype.enterFrame = function()
 	this.context2D.restore();
 };
 
+/**
+ * All points hit the stage
+ */
+aj.Stage.prototype.hitTestPoint = function(point)
+{
+	return true;
+}
 
 
+/**
+ * Image
+ * @extends aj.DisplayObject
+ * @class Represents an image object
+ * @param {string} imageUrl Url of the picture
+ */
 aj.Image = function(imageUrl)
 {
 	this.super = aj.DisplayObject;
 	this.super();
+	
+	/**
+	 * The image object
+	 * @type Image
+	 */
+	this.image = null;
 	
 	this.image = new Image();
 	this.image.src = imageUrl;
 };
 
 aj.Image.prototype = new aj.DisplayObject;
-aj.Image.prototype.image = null;
 
+/**
+ * The drawBase method surcharged
+ */
 aj.Image.prototype.drawBase = function()
 {
 	var globalPoint = this.localToGlobal(this.getCoordPoint());
@@ -737,7 +1035,11 @@ aj.Image.prototype.drawBase = function()
 };
 
 
-
+/**
+ * Sprite
+ * @class Represents an common object with graphics support.
+ * @extends aj.DisplayObjectContainer
+ */
 aj.Sprite = function(){
 	this.super = aj.DisplayObjectContainer;
 	this.super();
@@ -746,4 +1048,3 @@ aj.Sprite = function(){
 };
 
 aj.Sprite.prototype = new aj.DisplayObjectContainer;
-aj.Sprite.prototype.graphics = null;
