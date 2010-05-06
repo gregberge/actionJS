@@ -9,9 +9,7 @@
 </head> 
 <body> 
 <script type="text/javascript"> 
- 
-jQuery(function(){
- 
+
 var stage = new aj.Stage("game");
  
 var sayOk = function(event)
@@ -32,7 +30,7 @@ displayObject.width = 300;
 displayObject.alpha = 0.3;
 displayObject.x = 20;
  
-var imageObject = new aj.Image("http://www.celticminded.com/forums/images/smilies/Mickey.gif");
+var imageObject = new aj.Image("http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
 imageObject.height = 50;
 imageObject.width = 50;
 imageObject.x = 20;
@@ -55,11 +53,11 @@ displayObjectContainer.name = "container";
 
 displayObject.addChild(imageObject);
 
-console.log(displayObjectContainer.width);
+//console.log(displayObjectContainer.width);
 
 displayObjectContainer.addChild(displayObject);
 
-console.log(displayObjectContainer.width);
+//console.log(displayObjectContainer.width);
 
 displayObject.mouseEnabled = true;
 displayObject.name = "dispobj";
@@ -92,11 +90,10 @@ function killMickey()
  
 stage.addChild(displayObjectContainer);
 stage.addEventListener(aj.Event.ENTER_FRAME, moveImage);
+
 //console.log(imageObject.localToGlobal(imageObject.getCoordPoint()));
- 
-});
+stage.load();
+
 </script> 
- 
-<canvas id="game" width="500" height="500"></div> 
 </body> 
 </html>

@@ -1,6 +1,6 @@
 /**
  * Action JS base object
- * @author Greg Bergé
+ * @author Greg Bergï¿½
  * @namespace The base namespace of actionJS library
  */
 aj  = {};
@@ -549,6 +549,11 @@ aj.DisplayObject.prototype.draw = function()
 aj.DisplayObject.prototype.preDraw = function()
 {
 	this.stage.context2D.globalAlpha = this.alpha;
+	
+	if(this.parent.autoResize)
+	{
+		this.parent.autoResize(this);
+	}
 };
 
 /**
@@ -636,8 +641,8 @@ aj.DisplayObjectContainer.prototype.autoResize = function(child)
 			}
 		}
 		
-		this._width = right - left;
-		this._height = bottom - top;
+		this._width = right;
+		this._height = bottom;
 	}
 };
 
@@ -910,7 +915,11 @@ aj.Stage = function(stageId, fps)
 	 * @private
 	 * @type object
 	 */
-	this.jqEl = jQuery("#" + stageId);
+	this.jqEl = null;
+	
+	var canvas = '<canvas id="' + stageId + '" height="500" width="500"></canvas>';
+	
+	this.jqEl = jQuery(canvas);
 	
 	/**
 	 * The 2D context of the canvas
@@ -952,7 +961,7 @@ aj.Stage = function(stageId, fps)
 		
 		if(this._fps < 1){ this._fps = 1; }
 		
-		this.initEnterFrame();
+		//this.initEnterFrame();
 	});
 	
 	
@@ -961,9 +970,9 @@ aj.Stage = function(stageId, fps)
 	this.parent = 'basepage';
 	
 	this.jqEl.get(0).addEventListener("click", jQuery.proxy(this.clickListener, this), false);
-		
-	this.initEnterFrame();
 };
+
+aj.Stage.preloadList = [];
 
 aj.Stage.prototype = new aj.DisplayObjectContainer;
 
@@ -1030,7 +1039,22 @@ aj.Stage.prototype.enterFrame = function()
 aj.Stage.prototype.hitTestPoint = function(point)
 {
 	return true;
-}
+};
+
+aj.Stage.prototype.load = function()
+{
+	$('body').append(this.jqEl);
+	
+	for (var i=0, il=aj.Stage.preloadList.length; i<il; i++)
+	{
+		aj.Stage.preloadList[i].image.addEventListener("load", jQuery.proxy(this.start, this), false);
+	}
+};
+
+aj.Stage.prototype.start = function()
+{
+	this.initEnterFrame();
+};
 
 
 /**
@@ -1052,6 +1076,8 @@ aj.Image = function(imageUrl)
 	
 	this.image = new Image();
 	this.image.src = imageUrl;
+	
+	aj.Stage.preloadList.push(this);
 };
 
 aj.Image.prototype = new aj.DisplayObject;
