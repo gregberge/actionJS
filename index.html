@@ -11,6 +11,11 @@
 <script type="text/javascript"> 
 
 var stage = new aj.Stage("game");
+
+stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+stage.library.addImage("fox2", "http://farm1.static.flickr.com/219/510673167_4ee1b7e528.jpg");
+stage.library.addImage("fo", "http://farm1.static.flickr.com/200/510673177_b51a74955b.jpg");
+stage.library.addImage("foxsd", "http://farm1.static.flickr.com/212/515513926_8e5acbffe9.jpg");
  
 var sayOk = function(event)
 {
@@ -30,7 +35,7 @@ displayObject.width = 300;
 displayObject.alpha = 0.3;
 displayObject.x = 20;
  
-var imageObject = new aj.Image("http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+var imageObject = new aj.Image(stage.library.get("fox"));
 imageObject.height = 50;
 imageObject.width = 50;
 imageObject.x = 20;
@@ -91,9 +96,17 @@ function killMickey()
 stage.addChild(displayObjectContainer);
 stage.addEventListener(aj.Event.ENTER_FRAME, moveImage);
 
+function onProgress(event)
+{
+	$("#loading").html(((event.loaded / event.total)*100) + "%");
+}
+stage.library.addEventListener(aj.ProgressEvent.PROGRESS, onProgress);
+
 //console.log(imageObject.localToGlobal(imageObject.getCoordPoint()));
 stage.load();
 
 </script> 
+
+<div id="loading"></div>
 </body> 
 </html>
