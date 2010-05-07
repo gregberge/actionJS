@@ -64,9 +64,17 @@ aj.Event = function(type)
  */
 aj.Event.ENTER_FRAME = "enter_frame";
 
+/**
+ * Complete event type
+ * @public
+ * @static
+ * @type string
+ */
+aj.Event.COMPLETE = "complete";
+
 
 /**
- * Event base class
+ * Event mouse class
  * @class Represents an event.
  * @extends aj.Event 
  * @param {string} type Event type
@@ -86,6 +94,32 @@ aj.MouseEvent.prototype = new aj.Event;
  * @type string
  */
 aj.MouseEvent.CLICK = "click";
+
+
+/**
+ * Event progress class
+ * @class Represents an event.
+ * @extends aj.Event 
+ * @param {string} type Event type
+ */
+aj.ProgressEvent = function(type)
+{
+	this.super = aj.Event;
+	this.super(type);
+	
+	this.total = 0;
+	this.loaded = 0;
+};
+
+aj.ProgressEvent.prototype = new aj.Event;
+
+/**
+ * Progress event type
+ * @public
+ * @static
+ * @type string
+ */
+aj.ProgressEvent.PROGRESS = "progress";
 
 
 /**
@@ -965,14 +999,14 @@ aj.Stage = function(stageId, fps)
 	});
 	
 	
+	this.library = new aj.Library();
+	
 	this.name = stageId;
 	this.stage = this;
 	this.parent = 'basepage';
 	
 	this.jqEl.get(0).addEventListener("click", jQuery.proxy(this.clickListener, this), false);
 };
-
-aj.Stage.preloadList = [];
 
 aj.Stage.prototype = new aj.DisplayObjectContainer;
 
@@ -1045,25 +1079,100 @@ aj.Stage.prototype.load = function()
 {
 	$('body').append(this.jqEl);
 	
-	for (var i=0, il=aj.Stage.preloadList.length; i<il; i++)
-	{
-		aj.Stage.preloadList[i].image.addEventListener("load", jQuery.proxy(this.start, this), false);
-	}
+	this.library.addEventListener(aj.Event.COMPLETE, jQuery.proxy(this.start, this));
+	this.library.load();
 };
 
 aj.Stage.prototype.start = function()
 {
+	this.library.removeEventListener(aj.Event.COMPLETE, this.start);
 	this.initEnterFrame();
 };
+
+
+
+aj.Library = function()
+{
+	this.super = aj.EventDispatcher;
+	this.super();
+	
+	this.library = [];
+	this.loadingList = [];
+	
+	this.totalToLoad = 0;
+	this.totalLoaded = 0;
+}
+
+aj.Library.prototype = new aj.EventDispatcher();
+
+aj.Library.prototype.addImage = function(id, url)
+{
+	var image = new Image();
+	image.src = url;
+	
+	this.library[id] = {};
+	this.library[id].obj = image;
+	
+	this.loadingList.push(this.library[id]);
+};
+
+aj.Library.prototype.load = function()
+{
+	this.totalToLoad = this.loadingList.length;
+	this.totalLoaded = 0;
+	
+	for(var i=0, il=this.loadingList.length; i<il; i++)
+	{
+    	this.loadObject(this.loadingList[i]);
+    }
+};
+
+aj.Library.prototype.loadObject = function(objToLoad)
+{
+	objToLoad.obj.addEventListener("load", jQuery.proxy(this.increaseLoad, this), false);
+};
+
+aj.Library.prototype.increaseLoad = function()
+{
+	this.totalLoaded ++;
+	
+	var progressEvent = new aj.ProgressEvent(aj.ProgressEvent.PROGRESS);
+	progressEvent.total = this.totalToLoad;
+	progressEvent.loaded = this.totalLoaded;
+	this.dispatchEvent(progressEvent);
+	
+	if(this.totalLoaded == this.totalToLoad)
+	{
+		this.completeLoading();
+	}
+};
+
+aj.Library.prototype.completeLoading = function()
+{
+	var completeEvent = new aj.Event(aj.Event.COMPLETE);
+	this.dispatchEvent(completeEvent);
+	
+	this.loadingList = [];
+};
+
+aj.Library.prototype.get = function(id)
+{
+	if(this.library[id])
+	{
+		return this.library[id].obj;
+	}
+	
+	return null;
+}
 
 
 /**
  * Image
  * @extends aj.DisplayObject
  * @class Represents an image object
- * @param {string} imageUrl Url of the picture
+ * @param {Image} image The image dom object
  */
-aj.Image = function(imageUrl)
+aj.Image = function(image)
 {
 	this.super = aj.DisplayObject;
 	this.super();
@@ -1072,12 +1181,7 @@ aj.Image = function(imageUrl)
 	 * The image object
 	 * @type Image
 	 */
-	this.image = null;
-	
-	this.image = new Image();
-	this.image.src = imageUrl;
-	
-	aj.Stage.preloadList.push(this);
+	this.image = image;
 };
 
 aj.Image.prototype = new aj.DisplayObject;
