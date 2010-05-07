@@ -56,15 +56,17 @@ displayObjectContainer.name = "container";
 
 var images = [];
 
+stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+
 for(var i = 1; i < 50; i++)
 {
-	var imageObject = new aj.Image("http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+	var imageObject = new aj.Image(stage.library.get("fox"));
 	imageObject.height = 50;
 	imageObject.width = 50;
 	imageObject.x = 20;
 	imageObject.y = Math.random()*300;
 	
-	imageObject.speed = Math.random()*20;
+	imageObject.speed = Math.random()*5;
 	
 	displayObject.addChild(imageObject);
 
@@ -85,6 +87,24 @@ function moveImage()
 	for(var i = 0; i < images.length; i++)
 	{
 		var imageObject = images[i];
+
+		if(stage.key.isDown(aj.Key.UP))
+		{
+			imageObject.y -= 4;
+		}
+		if(stage.key.isDown(aj.Key.DOWN))
+		{
+			imageObject.y += 4;
+		}
+		if(stage.key.isDown(aj.Key.LEFT))
+		{
+			imageObject.x -= 4;
+		}
+		if(stage.key.isDown(aj.Key.RIGHT))
+		{
+			imageObject.x += 4;
+		}
+		
 		if(imageObject)
 		{
 			if(imageObject.x < 300)
@@ -109,7 +129,7 @@ function killMickey()
 		imageObject = null;
 	}
 };
- 
+
 stage.addChild(displayObjectContainer);
 stage.addEventListener(aj.Event.ENTER_FRAME, moveImage);
 
@@ -121,6 +141,8 @@ stage.library.addEventListener(aj.ProgressEvent.PROGRESS, onProgress);
 
 //console.log(imageObject.localToGlobal(imageObject.getCoordPoint()));
 stage.load();
+
+stage.showFps = true;
 
 </script> 
 

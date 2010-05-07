@@ -81,8 +81,6 @@ aj.Event.COMPLETE = "complete";
  */
 aj.MouseEvent = function(type)
 {
-	this.super = aj.Event;
-	this.super(type);
 };
 
 aj.MouseEvent.prototype = new aj.Event;
@@ -104,9 +102,6 @@ aj.MouseEvent.CLICK = "click";
  */
 aj.ProgressEvent = function(type)
 {
-	this.super = aj.Event;
-	this.super(type);
-	
 	this.total = 0;
 	this.loaded = 0;
 };
@@ -249,8 +244,7 @@ aj.EventDispatcher.prototype.willTriger = function(type)
  */
 aj.DisplayObject = function(params)
 {
-	this.super = aj.EventDispatcher;
-	this.super();
+	
 	
 	/**
 	 * The parent of the display object
@@ -617,8 +611,7 @@ aj.DisplayObject.prototype.postDraw = function()
  */
 aj.DisplayObjectContainer = function()
 {
-	this.super = aj.DisplayObject;
-	this.super();
+	
 	
 	this.children = [];
 	
@@ -941,9 +934,6 @@ aj.DisplayObjectContainer.prototype.draw = function()
  */
 aj.Stage = function(stageId, fps)
 {
-	this.super = aj.DisplayObjectContainer;
-	this.super();
-	
 	/**
 	 * The jQuery element
 	 * @private
@@ -972,10 +962,10 @@ aj.Stage = function(stageId, fps)
 	/**
 	 * The frame per second
 	 * @private
-	 * @default 150
+	 * @default 50
 	 * @type number
 	 */
-	this._fps = 150;
+	this._fps = 50;
 	
 	if(this._fps != null){ this.fps = fps; };
 	
@@ -998,14 +988,32 @@ aj.Stage = function(stageId, fps)
 		//this.initEnterFrame();
 	});
 	
+	this.trueFps = 0;
+	this.showFps = false;
+	this.fpsInterval = null;
+	this.lastDisplayFpsTime = 0;
+	this.keyDowns = [];
+	
+	var date = new Date();
+	this.lastTime = date.getTime();
 	
 	this.library = new aj.Library();
+	
+	this.key = new aj.Key(this);
 	
 	this.name = stageId;
 	this.stage = this;
 	this.parent = 'basepage';
 	
-	this.jqEl.get(0).addEventListener("click", jQuery.proxy(this.clickListener, this), false);
+	this.jqEl[0].addEventListener("click", jQuery.proxy(this.clickListener, this), false);
+	
+	this.jqEl.css("outline", "none");
+	this.jqEl.css("left", "100px");
+	this.jqEl.css("top", "100px");
+	//this.jqEl.css("border", "1px solid #000");
+	this.jqEl.css("font-size", "1px");
+	this.jqEl.css("border", "1px solid #000");
+	this.jqEl.attr("contentEditable", "true");
 };
 
 aj.Stage.prototype = new aj.DisplayObjectContainer;
@@ -1065,6 +1073,22 @@ aj.Stage.prototype.enterFrame = function()
 	this.draw();
 	
 	this.context2D.restore();
+	
+	if(this.showFps)
+	{
+		var date = new Date();
+		var curTime = date.getTime();
+		
+		if(curTime - this.lastDisplayFpsTime > 400)
+		{
+			this.trueFps = Math.round(1000 / (curTime - this.lastTime));
+			this.lastDisplayFpsTime = curTime;
+		}
+		
+		this.lastTime = curTime;
+		
+		this.displayFps();
+	}
 };
 
 /**
@@ -1089,19 +1113,93 @@ aj.Stage.prototype.start = function()
 	this.initEnterFrame();
 };
 
+aj.Stage.prototype.displayFps = function()
+{
+	this.context2D.fillStyle = '#000';
+	this.context2D.font = 'normal 12px sans-serif';
+	this.context2D.textBaseline = 'top';
+	this.context2D.fillText("Fps: " + this.trueFps + " / " + this.fps, 0, 0);
+};
+
+
+aj.Key = function(stage)
+{
+	this.keysDown = [];
+	
+	stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
+	stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
+};
+
+aj.Key.LEFT = 37;
+aj.Key.UP = 38;
+aj.Key.RIGHT = 39;
+aj.Key.DOWN = 40;
+
+aj.Key.prototype.keyDownListener = function(event)
+{
+	event.preventDefault();
+	
+	if(this.isUp(event.keyCode))
+	{
+		this.keysDown.push(event.keyCode);
+	}
+	
+	console.log(this.keysDown);
+	
+	return false;
+};
+
+aj.Key.prototype.keyUpListener = function(event)
+{	
+	for(var i=0, il=this.keysDown.length; i<il; i++)
+	{
+		if(this.keysDown[i] == event.keyCode)
+		{
+			this.keysDown.splice(i, 1);
+		}
+	}
+	
+	return false;
+};
+
+aj.Key.prototype.isDown = function(keyCode)
+{
+	for(var i=0, il=this.keysDown.length; i<il; i++)
+	{
+		if(this.keysDown[i] == keyCode)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+};
+
+aj.Key.prototype.isUp = function(keyCode)
+{
+	var exist = false;
+	
+	for(var i=0, il=this.keysDown.length; i<il; i++)
+	{
+		if(this.keysDown[i] == keyCode)
+		{
+			exist = true;
+		}
+	}
+	
+	return !exist;
+};
+
 
 
 aj.Library = function()
 {
-	this.super = aj.EventDispatcher;
-	this.super();
-	
 	this.library = [];
 	this.loadingList = [];
 	
 	this.totalToLoad = 0;
 	this.totalLoaded = 0;
-}
+};
 
 aj.Library.prototype = new aj.EventDispatcher();
 
@@ -1141,6 +1239,8 @@ aj.Library.prototype.increaseLoad = function()
 	progressEvent.loaded = this.totalLoaded;
 	this.dispatchEvent(progressEvent);
 	
+	
+	
 	if(this.totalLoaded == this.totalToLoad)
 	{
 		this.completeLoading();
@@ -1163,7 +1263,7 @@ aj.Library.prototype.get = function(id)
 	}
 	
 	return null;
-}
+};
 
 
 /**
@@ -1174,9 +1274,6 @@ aj.Library.prototype.get = function(id)
  */
 aj.Image = function(image)
 {
-	this.super = aj.DisplayObject;
-	this.super();
-	
 	/**
 	 * The image object
 	 * @type Image
@@ -1205,10 +1302,8 @@ aj.Image.prototype.drawBase = function()
  * @class Represents an common object with graphics support.
  * @extends aj.DisplayObjectContainer
  */
-aj.Sprite = function(){
-	this.super = aj.DisplayObjectContainer;
-	this.super();
-	
+aj.Sprite = function()
+{
 	this.graphics = null;
 };
 
