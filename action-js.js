@@ -1,6 +1,6 @@
 /**
  * Action JS base object
- * @author Greg Berg�
+ * @author Greg Bergé
  * @namespace The base namespace of actionJS library
  */
 aj  = {};
@@ -8,19 +8,19 @@ aj  = {};
 /**
  * Point representation
  * @class Represents a point.
- * @param [x=0] {number} The absciss coord of the point
- * @param [y=0] {number} The ordonnee coord of the point
+ * @param [x=0] {number} The abscissa value of the point
+ * @param [y=0] {number} The ordinate value of the point
  */
 aj.Point = function(x, y)
 {
 	/**
-     * The absciss coord of the point
+     * The abscissa value of the point
      * @type number
      */
 	this.x = x;
 	
 	/**
-     * The ordonnee coord of the point
+     * The ordinate value of the point
      * @type number
      */
 	this.y = y;
@@ -107,6 +107,11 @@ aj.KeyEvent = function(type)
 	this.sup = aj.Event;
 	this.sup(type);
 	
+	/**
+	 * The key code
+	 * @public
+	 * @type integer
+	 */
 	this.keyCode = 0;
 };
 
@@ -140,7 +145,18 @@ aj.ProgressEvent = function(type)
 	this.sup = aj.Event;
 	this.sup(type);
 	
+	/**
+	 * The amount number of data to load
+	 * @public
+	 * @type integer
+	 */
 	this.total = 0;
+	
+	/**
+	 * The amount number of data loaded
+	 * @public
+	 * @type integer
+	 */
 	this.loaded = 0;
 };
 
@@ -161,6 +177,11 @@ aj.ProgressEvent.PROGRESS = "progress";
  */
 aj.EventDispatcher = function()
 {
+	/**
+	 * The event listeners list
+	 * @private
+	 * @type array
+	 */
 	this.eventListenerList = [];
 };
 
@@ -658,12 +679,12 @@ aj.DisplayObjectContainer = function()
 	this.sup = aj.DisplayObject;
 	this.sup();
 	
+	/**
+	 * The children
+	 * @private
+	 * @type array
+	 */
 	this.children = [];
-	
-	this.left = 0;
-	this.right = 0;
-	this.top = 0;
-	this.bottom = 0;
 	
 	/**
 	 * Getter numChildren
@@ -953,7 +974,7 @@ aj.DisplayObjectContainer.prototype.swapChildrenAt = function(index1, index2)
 };
 
 /**
- * The draw method surcharge
+ * The draw method extend
  * @returns {void}
  */
 aj.DisplayObjectContainer.prototype.draw = function()
@@ -974,8 +995,9 @@ aj.DisplayObjectContainer.prototype.draw = function()
 /**
  * Stage
  * @extends aj.DisplayObjectContainer
+ * @class Represents the stage class.
  * @param {string} stageId The DOM id of the canvas
- * @param {number} fps The fps of the stage
+ * @param {number} fps The FPS of the stage
  */
 aj.Stage = function(stageId, fps)
 {
@@ -1036,17 +1058,50 @@ aj.Stage = function(stageId, fps)
 		//this.initEnterFrame();
 	});
 	
+	/**
+	 * The true FPS value
+	 * @private
+	 * @type integer
+	 */
 	this.trueFps = 0;
+	
+	/**
+	 * Show FPS on stage or not
+	 * @public
+	 * @default false
+	 * @type boolean
+	 */
 	this.showFps = false;
-	this.fpsInterval = null;
+	
+	/**
+	 * The last display FPS time
+	 * @private
+	 * @type integer
+	 */
 	this.lastDisplayFpsTime = 0;
-	this.keyDowns = [];
+
 	
 	var date = new Date();
+	
+	/**
+	 * The last ENTER_FRAME call time
+	 * @private
+	 * @type integer
+	 */
 	this.lastTime = date.getTime();
 	
+	/**
+	 * The library
+	 * @public
+	 * @type aj.Library
+	 */
 	this.library = new aj.Library();
 	
+	/**
+	 * The key manager
+	 * @public
+	 * @type aj.Key
+	 */
 	this.key = new aj.Key(this);
 	
 	this.name = stageId;
@@ -1097,6 +1152,7 @@ aj.Stage.prototype.initEnterFrame = function()
 
 /**
  * Stage forward
+ * @private
  * @param {aj.DisplayObject} child The child
  * @return {void}
  */
@@ -1107,6 +1163,7 @@ aj.Stage.prototype.setChildStage = function(child)
 
 /**
  * The main enterFrame function
+ * @private
  * @event
  * @returns {void}
  */
@@ -1147,6 +1204,11 @@ aj.Stage.prototype.hitTestPoint = function(point)
 	return true;
 };
 
+/**
+ * Load the library and after, start the stage
+ * @public
+ * @returns {void}
+ */
 aj.Stage.prototype.load = function()
 {
 	$('body').append(this.jqEl);
@@ -1155,12 +1217,22 @@ aj.Stage.prototype.load = function()
 	this.library.load();
 };
 
+/**
+ * Start the animation
+ * @public
+ * @returns {void}
+ */
 aj.Stage.prototype.start = function()
 {
 	this.library.removeEventListener(aj.Event.COMPLETE, this.start);
 	this.initEnterFrame();
 };
 
+/**
+ * Display FPS on the stage
+ * @private
+ * @returns {void}
+ */
 aj.Stage.prototype.displayFps = function()
 {
 	this.context2D.fillStyle = '#000';
@@ -1170,6 +1242,10 @@ aj.Stage.prototype.displayFps = function()
 };
 
 
+/**
+ * Key
+ * @class Represents the key, manage keyboard events.
+ */
 aj.Key = function(stage)
 {
 	this.keysDown = [];
@@ -1179,11 +1255,41 @@ aj.Key = function(stage)
 	this.stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
 };
 
+/**
+ * The left key code
+ * @static
+ * @type integer
+ */
 aj.Key.LEFT = 37;
+
+/**
+ * The up key code
+ * @static
+ * @type integer
+ */
 aj.Key.UP = 38;
+
+/**
+ * The right key code
+ * @static
+ * @type integer
+ */
 aj.Key.RIGHT = 39;
+
+/**
+ * The down key code
+ * @static
+ * @type integer
+ */
 aj.Key.DOWN = 40;
 
+/**
+ * The listener of the event onkeydown
+ * @private
+ * @event
+ * @param {event} event The event
+ * @returns {boolean} false to stop propagation
+ */
 aj.Key.prototype.keyDownListener = function(event)
 {
 	event.preventDefault();
@@ -1200,6 +1306,13 @@ aj.Key.prototype.keyDownListener = function(event)
 	return false;
 };
 
+/**
+ * The listener of the event onkeyup
+ * @private
+ * @event
+ * @param {event} event The event
+ * @returns {boolean} false to stop propagation
+ */
 aj.Key.prototype.keyUpListener = function(event)
 {	
 	for(var i=0, il=this.keysDown.length; i<il; i++)
@@ -1217,6 +1330,12 @@ aj.Key.prototype.keyUpListener = function(event)
 	return false;
 };
 
+/**
+ * Check if a key is down
+ * @public
+ * @param {integer} keyCode Key code to test
+ * @returns {boolean} true if the key is down, else false
+ */
 aj.Key.prototype.isDown = function(keyCode)
 {
 	for(var i=0, il=this.keysDown.length; i<il; i++)
@@ -1230,6 +1349,12 @@ aj.Key.prototype.isDown = function(keyCode)
 	return false;
 };
 
+/**
+ * Check if a key is up
+ * @public
+ * @param {integer} keyCode Key code to test
+ * @returns {boolean} true if the key is up, else false
+ */
 aj.Key.prototype.isUp = function(keyCode)
 {
 	var exist = false;
@@ -1246,21 +1371,54 @@ aj.Key.prototype.isUp = function(keyCode)
 };
 
 
-
+/**
+ * Library
+ * @extends aj.EventDispatcher
+ * @class Represents a library to load image.
+ */
 aj.Library = function()
 {
 	this.sup = aj.EventDispatcher;
 	this.sup();
 	
+	/**
+	 * The library array
+	 * @private
+	 * @type Array
+	 */
 	this.library = [];
+	
+	/**
+	 * The loading array
+	 * @private
+	 * @type Array
+	 */
 	this.loadingList = [];
 	
+	/**
+	 * Total of objects to load
+	 * @private
+	 * @type integer
+	 */
 	this.totalToLoad = 0;
+	
+	/**
+	 * Total of objects loaded
+	 * @private
+	 * @type integer
+	 */
 	this.totalLoaded = 0;
 };
 
 aj.Library.prototype = new aj.EventDispatcher();
 
+/**
+ * Add an image in the library
+ * @public
+ * @param {string} id Id of the image
+ * @param {string} url Url of the object
+ * @returns {Image} The image object created
+ */
 aj.Library.prototype.addImage = function(id, url)
 {
 	var image = new Image();
@@ -1270,8 +1428,15 @@ aj.Library.prototype.addImage = function(id, url)
 	this.library[id].obj = image;
 	
 	this.loadingList.push(this.library[id]);
+	
+	return this.library[id].obj;
 };
 
+/**
+ * Load the library
+ * @public
+ * @returns {void}
+ */
 aj.Library.prototype.load = function()
 {
 	this.totalToLoad = this.loadingList.length;
@@ -1283,11 +1448,22 @@ aj.Library.prototype.load = function()
     }
 };
 
+/**
+ * Load an object in the library
+ * @private
+ * @param {object} objToLoad Object to load
+ * @returns {void}
+ */
 aj.Library.prototype.loadObject = function(objToLoad)
 {
 	objToLoad.obj.addEventListener("load", jQuery.proxy(this.increaseLoad, this), false);
 };
 
+/**
+ * Increase the loading
+ * @private
+ * @returns {void}
+ */
 aj.Library.prototype.increaseLoad = function()
 {
 	this.totalLoaded ++;
@@ -1303,6 +1479,11 @@ aj.Library.prototype.increaseLoad = function()
 	}
 };
 
+/**
+ * Finish the loading
+ * @private
+ * @returns {void}
+ */
 aj.Library.prototype.completeLoading = function()
 {
 	var completeEvent = new aj.Event(aj.Event.COMPLETE);
@@ -1311,6 +1492,12 @@ aj.Library.prototype.completeLoading = function()
 	this.loadingList = [];
 };
 
+/**
+ * Get an object in the library
+ * @public
+ * @param {string} id Id of the object
+ * @returns {object} The object
+ */
 aj.Library.prototype.get = function(id)
 {
 	if(this.library[id])
@@ -1343,7 +1530,7 @@ aj.Image = function(image)
 aj.Image.prototype = new aj.DisplayObject;
 
 /**
- * The drawBase method surcharged
+ * The drawBase method extend
  */
 aj.Image.prototype.drawBase = function()
 {
