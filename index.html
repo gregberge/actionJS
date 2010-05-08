@@ -41,7 +41,7 @@ imageObject.width = 50;
 imageObject.x = 20;
  
  
-imageObject.addEventListener(aj.MouseEvent.CLICK, killMickey);
+//imageObject.addEventListener(aj.MouseEvent.CLICK, killMickey);
  
 var eventApuMickey = new aj.Event("pumickey");
 eventApuMickey.coucou = "Mickey est mort !";
@@ -58,13 +58,14 @@ var images = [];
 
 stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
 
-for(var i = 1; i < 50; i++)
+for(var i = 1; i < 3; i++)
 {
 	var imageObject = new aj.Image(stage.library.get("fox"));
 	imageObject.height = 50;
 	imageObject.width = 50;
 	imageObject.x = 20;
 	imageObject.y = Math.random()*300;
+	imageObject.addEventListener(aj.MouseEvent.CLICK, onClick);
 	
 	imageObject.speed = Math.random()*5;
 	
@@ -72,6 +73,12 @@ for(var i = 1; i < 50; i++)
 
 	images.push(imageObject);
 }
+
+function onClick(event)
+{
+}
+
+stage.addEventListener(aj.MouseEvent.CLICK, onClick);
 
 //console.log(displayObjectContainer.width);
 
@@ -137,15 +144,22 @@ function onProgress(event)
 {
 	$("#loading").html(((event.loaded / event.total)*100) + "%");
 }
+
 stage.library.addEventListener(aj.ProgressEvent.PROGRESS, onProgress);
 
+
+function onKeyDown(event)
+{
+	//alert(event.keyCode);
+};
+
+stage.addEventListener(aj.KeyEvent.KEY_DOWN, onKeyDown);
 //console.log(imageObject.localToGlobal(imageObject.getCoordPoint()));
 stage.load();
 
 stage.showFps = true;
 
 </script> 
-
 <div id="loading"></div>
 </body> 
 </html>

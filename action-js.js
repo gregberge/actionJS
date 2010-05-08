@@ -47,13 +47,13 @@ aj.Event = function(type)
      * The target of the event
      * @type aj.EventDispatcher
      */
-	this.target = {};
+	this.target = null;
 	
 	/**
      * The current target of the event
      * @type aj.EventDispatcher
      */
-	this.currentTarget = {};
+	this.currentTarget = null;
 };
 
 /**
@@ -81,6 +81,8 @@ aj.Event.COMPLETE = "complete";
  */
 aj.MouseEvent = function(type)
 {
+	this.sup = aj.Event;
+	this.sup(type);
 };
 
 aj.MouseEvent.prototype = new aj.Event;
@@ -95,6 +97,39 @@ aj.MouseEvent.CLICK = "click";
 
 
 /**
+ * Event keyboard class
+ * @class Represents an event.
+ * @extends aj.Event 
+ * @param {string} type Event type
+ */
+aj.KeyEvent = function(type)
+{
+	this.sup = aj.Event;
+	this.sup(type);
+	
+	this.keyCode = 0;
+};
+
+aj.KeyEvent.prototype = new aj.Event;
+
+/**
+ * Key down event type
+ * @public
+ * @static
+ * @type string
+ */
+aj.KeyEvent.KEY_DOWN = "key_down";
+
+/**
+ * Key up event type
+ * @public
+ * @static
+ * @type string
+ */
+aj.KeyEvent.KEY_UP = "key_up";
+
+
+/**
  * Event progress class
  * @class Represents an event.
  * @extends aj.Event 
@@ -102,6 +137,9 @@ aj.MouseEvent.CLICK = "click";
  */
 aj.ProgressEvent = function(type)
 {
+	this.sup = aj.Event;
+	this.sup(type);
+	
 	this.total = 0;
 	this.loaded = 0;
 };
@@ -163,6 +201,8 @@ aj.EventDispatcher.prototype.dispatchEvent = function(event)
 	    	
 	    	if(eventListener[0] == event.type)
 	    	{
+	    		event.target = this;
+	    		
 	    		eventListener[1].call(this, event);
 	    	}
 		}
@@ -244,7 +284,8 @@ aj.EventDispatcher.prototype.willTriger = function(type)
  */
 aj.DisplayObject = function(params)
 {
-	
+	this.sup = aj.EventDispatcher;
+	this.sup();
 	
 	/**
 	 * The parent of the display object
@@ -536,7 +577,7 @@ aj.DisplayObject.prototype.hitTestPoint = function(point)
  * @private
  * @param {aj.Point} point The current mouse point
  * @param {aj.MouseEvent} mouseEvent The mouse event
- * @returns {void}
+ * @returns {boolean} true if point match object, else false
  */
 aj.DisplayObject.prototype.mouseTest = function(point, mouseEvent)
 {	
@@ -554,7 +595,10 @@ aj.DisplayObject.prototype.mouseTest = function(point, mouseEvent)
 				this.children[i].mouseTest(point, mouseEvent);
 			}
 		}
+		return true;
 	}
+	
+	return false;
 };
 
 /**
@@ -611,7 +655,8 @@ aj.DisplayObject.prototype.postDraw = function()
  */
 aj.DisplayObjectContainer = function()
 {
-	
+	this.sup = aj.DisplayObject;
+	this.sup();
 	
 	this.children = [];
 	
@@ -934,6 +979,9 @@ aj.DisplayObjectContainer.prototype.draw = function()
  */
 aj.Stage = function(stageId, fps)
 {
+	this.sup = aj.DisplayObjectContainer;
+	this.sup();
+	
 	/**
 	 * The jQuery element
 	 * @private
@@ -1125,9 +1173,10 @@ aj.Stage.prototype.displayFps = function()
 aj.Key = function(stage)
 {
 	this.keysDown = [];
+	this.stage = stage;
 	
-	stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
-	stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
+	this.stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
+	this.stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
 };
 
 aj.Key.LEFT = 37;
@@ -1142,9 +1191,11 @@ aj.Key.prototype.keyDownListener = function(event)
 	if(this.isUp(event.keyCode))
 	{
 		this.keysDown.push(event.keyCode);
+		
+		var keyEvent = new aj.KeyEvent(aj.KeyEvent.KEY_DOWN);
+		keyEvent.keyCode = event.keyCode;
+		this.stage.dispatchEvent(keyEvent);
 	}
-	
-	console.log(this.keysDown);
 	
 	return false;
 };
@@ -1156,6 +1207,10 @@ aj.Key.prototype.keyUpListener = function(event)
 		if(this.keysDown[i] == event.keyCode)
 		{
 			this.keysDown.splice(i, 1);
+			
+			var keyEvent = new aj.KeyEvent(aj.KeyEvent.KEY_UP);
+			keyEvent.keyCode = event.keyCode;
+			this.stage.dispatchEvent(keyEvent);
 		}
 	}
 	
@@ -1194,6 +1249,9 @@ aj.Key.prototype.isUp = function(keyCode)
 
 aj.Library = function()
 {
+	this.sup = aj.EventDispatcher;
+	this.sup();
+	
 	this.library = [];
 	this.loadingList = [];
 	
@@ -1239,8 +1297,6 @@ aj.Library.prototype.increaseLoad = function()
 	progressEvent.loaded = this.totalLoaded;
 	this.dispatchEvent(progressEvent);
 	
-	
-	
 	if(this.totalLoaded == this.totalToLoad)
 	{
 		this.completeLoading();
@@ -1274,6 +1330,9 @@ aj.Library.prototype.get = function(id)
  */
 aj.Image = function(image)
 {
+	this.sup = aj.DisplayObject;
+	this.sup();
+	
 	/**
 	 * The image object
 	 * @type Image
@@ -1304,6 +1363,9 @@ aj.Image.prototype.drawBase = function()
  */
 aj.Sprite = function()
 {
+	this.sup = aj.DisplayObjectContainer;
+	this.sup();
+	
 	this.graphics = null;
 };
 
