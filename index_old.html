@@ -1,0 +1,165 @@
+<!DOCTYPE html> 
+ 
+<html lang="fr"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <title>Action JS</title> 
+  <script type="text/javascript" src="jquery.min.js?1"></script> 
+  <script type="text/javascript" src="action-js.js?1"></script> 
+</head> 
+<body> 
+<script type="text/javascript"> 
+
+var stage = new aj.Stage("game");
+
+stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+stage.library.addImage("fox2", "http://farm1.static.flickr.com/219/510673167_4ee1b7e528.jpg");
+stage.library.addImage("fo", "http://farm1.static.flickr.com/200/510673177_b51a74955b.jpg");
+stage.library.addImage("foxsd", "http://farm1.static.flickr.com/212/515513926_8e5acbffe9.jpg");
+ 
+var sayOk = function(event)
+{
+	//alert("ok");
+	eventDispatcher.removeEventListener(event.type, sayOk);
+};
+ 
+var event = new aj.Event("START");
+var eventDispatcher = new aj.EventDispatcher();
+eventDispatcher.addEventListener(event.type, sayOk);
+eventDispatcher.dispatchEvent(event);
+ 
+ 
+var displayObject = new aj.Sprite();
+displayObject.height = 20;
+displayObject.width = 300;
+displayObject.alpha = 0.3;
+displayObject.x = 20;
+ 
+var imageObject = new aj.Image(stage.library.get("fox"));
+imageObject.height = 50;
+imageObject.width = 50;
+imageObject.x = 20;
+ 
+ 
+//imageObject.addEventListener(aj.MouseEvent.CLICK, killMickey);
+ 
+var eventApuMickey = new aj.Event("pumickey");
+eventApuMickey.coucou = "Mickey est mort !";
+ 
+imageObject.addEventListener(eventApuMickey.type, function(event){ alert(event.coucou); });
+imageObject.name = "image";
+ 
+var displayObjectContainer = new aj.DisplayObjectContainer();
+displayObjectContainer.x = 200;
+displayObjectContainer.y = 200;
+displayObjectContainer.name = "container";
+
+var images = [];
+
+stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+
+for(var i = 1; i < 3; i++)
+{
+	var imageObject = new aj.Image(stage.library.get("fox"));
+	imageObject.height = 50;
+	imageObject.width = 50;
+	imageObject.x = 20;
+	imageObject.y = Math.random()*300;
+	imageObject.addEventListener(aj.MouseEvent.CLICK, onClick);
+	
+	imageObject.speed = Math.random()*5;
+	
+	displayObject.addChild(imageObject);
+
+	images.push(imageObject);
+}
+
+function onClick(event)
+{
+}
+
+stage.addEventListener(aj.MouseEvent.CLICK, onClick);
+
+//console.log(displayObjectContainer.width);
+
+displayObjectContainer.addChild(displayObject);
+
+//console.log(displayObjectContainer.width);
+
+displayObject.mouseEnabled = true;
+displayObject.name = "dispobj";
+ 
+function moveImage()
+{
+	for(var i = 0; i < images.length; i++)
+	{
+		var imageObject = images[i];
+
+		if(stage.key.isDown(aj.Key.UP))
+		{
+			imageObject.y -= 4;
+		}
+		if(stage.key.isDown(aj.Key.DOWN))
+		{
+			imageObject.y += 4;
+		}
+		if(stage.key.isDown(aj.Key.LEFT))
+		{
+			imageObject.x -= 4;
+		}
+		if(stage.key.isDown(aj.Key.RIGHT))
+		{
+			imageObject.x += 4;
+		}
+		
+		if(imageObject)
+		{
+			if(imageObject.x < 300)
+			{
+				imageObject.x = imageObject.x + imageObject.speed;
+			}
+			else
+			{
+				imageObject.x = 20;
+			}
+		}
+	}
+};
+ 
+function killMickey()
+{
+	imageObject.alpha -= 0.4;
+		
+	if(imageObject.alpha == 0)
+	{
+		imageObject.dispatchEvent(eventApuMickey);
+		imageObject = null;
+	}
+};
+
+stage.addChild(displayObjectContainer);
+stage.addEventListener(aj.Event.ENTER_FRAME, moveImage);
+
+function onProgress(event)
+{
+	$("#loading").html(((event.loaded / event.total)*100) + "%");
+}
+
+stage.library.addEventListener(aj.ProgressEvent.PROGRESS, onProgress);
+
+
+function onKeyDown(event)
+{
+	//alert(event.keyCode);
+};
+
+stage.addEventListener(aj.KeyEvent.KEY_DOWN, onKeyDown);
+//console.log(imageObject.localToGlobal(imageObject.getCoordPoint()));
+stage.load();
+
+stage.showFps = true;
+
+</script> 
+<div id="loading"></div>
+</body> 
+</html>

@@ -1,5 +1,5 @@
 /**
- * Action JS base object
+ * Action JS library
  * @author Greg Bergé
  * @namespace The base namespace of actionJS library
  */
