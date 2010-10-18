@@ -82,8 +82,6 @@ aj.Library = aj.EventDispatcher.extend(
         this.totalToLoad = this.loadingList.length;
         this.totalLoaded = 0;
         
-        console.log("loading");
-        
         for(var i=0, il=this.loadingList.length; i<il; i++)
         {
             this.loadObject(this.loadingList[i]);

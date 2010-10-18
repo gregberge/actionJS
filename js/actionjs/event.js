@@ -50,7 +50,7 @@ aj.Event = Class.extend(
  * @static
  * @type string
  */
-aj.Event.ENTER_FRAME = "enter_frame";
+aj.Event.ENTER_FRAME = "enterFrame";
 
 /**
  * Complete event type
@@ -59,6 +59,14 @@ aj.Event.ENTER_FRAME = "enter_frame";
  * @type string
  */
 aj.Event.COMPLETE = "complete";
+
+/**
+ * Added to the stage
+ * @public
+ * @static
+ * @type string
+ */
+aj.Event.ADDED_TO_STAGE = "addedToStage";
 
 
 /**
@@ -121,7 +129,7 @@ aj.KeyboardEvent = aj.Event.extend(
  * @static
  * @type string
  */
-aj.KeyboardEvent.KEY_DOWN = "key_down";
+aj.KeyboardEvent.KEY_DOWN = "keyDown";
 
 /**
  * Key up event type
@@ -129,7 +137,7 @@ aj.KeyboardEvent.KEY_DOWN = "key_down";
  * @static
  * @type string
  */
-aj.KeyboardEvent.KEY_UP = "key_up";
+aj.KeyboardEvent.KEY_UP = "keyUp";
 
 
 /**
@@ -208,7 +216,7 @@ aj.EventDispatcher = Class.extend(
      */
     addEventListener : function(type, listener)
     {
-        if(typeof type != "undefined" && type && typeof listener != "undefined" && listener)
+        if(typeof type != "undefined" && typeof listener == "function")
         {
             var eventListener = [type, listener];
             this.eventListenerList.push(eventListener);
@@ -226,7 +234,7 @@ aj.EventDispatcher = Class.extend(
      */
     dispatchEvent : function(event)
     {
-        if(typeof event != "undefined" && event)
+        if(typeof event != "undefined")
         {
             for (var i=0, il=this.eventListenerList.length; i<il; i++)
             {
@@ -255,7 +263,7 @@ aj.EventDispatcher = Class.extend(
     {
         for (var i=0, il=this.eventListenerList.length; i<il; i++)
         {
-             var eventLister = this.eventListenerList[i];
+             var eventListener = this.eventListenerList[i];
             
              if(eventListener[0] && eventListener[0] == type)
              {

@@ -20,11 +20,19 @@ aj.Key = Class.extend(
      */
     init : function(stage)
     {
+		if(aj.Key._currentInstance === null)
+		{
+			aj.Key._currentInstance = this;
+		}
+		
         this.keysDown = [];
         this.stage = stage;
-        
-        this.stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
-        this.stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
+
+        //this.stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
+        //this.stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
+
+		document.onkeydown = jQuery.proxy(this.keyDownListener, this);
+        document.onkeyup = jQuery.proxy(this.keyUpListener, this);
     },
     
     /**
@@ -59,6 +67,8 @@ aj.Key = Class.extend(
      */
     keyUpListener : function(event)
     {   
+		event.preventDefault();
+		
         for(var i=0, il=this.keysDown.length; i<il; i++)
         {
             if(this.keysDown[i] == event.keyCode)
@@ -116,6 +126,25 @@ aj.Key = Class.extend(
 });
 
 /**
+ * Current instance
+ * @private
+ * @static
+ * @type aj.Key
+ */
+aj.Key._currentInstance = null;
+
+/**
+ * Return the current instance
+ * @public
+ * @static
+ * @returns {aj.Key}
+ */
+aj.Key.getCurrentInstance = function()
+{	
+	return aj.Key._currentInstance;
+};
+
+/**
  * The left key code
  * @static
  * @type integer
@@ -125,6 +154,7 @@ aj.Key.LEFT = 37;
 /**
  * The up key code
  * @static
+ * @public
  * @type integer
  */
 aj.Key.UP = 38;
@@ -132,6 +162,7 @@ aj.Key.UP = 38;
 /**
  * The right key code
  * @static
+ * @public
  * @type integer
  */
 aj.Key.RIGHT = 39;
@@ -139,6 +170,15 @@ aj.Key.RIGHT = 39;
 /**
  * The down key code
  * @static
+ * @public
  * @type integer
  */
 aj.Key.DOWN = 40;
+
+/**
+ * The space key code
+ * @static
+ * @public
+ * @type integer
+ */
+aj.Key.SPACE = 32;

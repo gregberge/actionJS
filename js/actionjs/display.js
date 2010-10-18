@@ -101,7 +101,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          * @returns {number} _width
          */
         this.__defineGetter__("width", function(){
-            return this._width;
+            return this._width * this._scaleX;
         });
         
         /**
@@ -109,9 +109,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          */
         this.__defineSetter__("width", function(val)
         {
-            this._width = Number(val);
-            
-            if(this._width < 0){ this._width = 0; }
+            this._scaleX = this._width / val;
         });
         
         
@@ -128,7 +126,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          * @returns {number} _height
          */
         this.__defineGetter__("height", function(){
-            return this._height;
+            return this._height * this._scaleY;
         });
         
         /**
@@ -136,9 +134,56 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          */
         this.__defineSetter__("height", function(val)
         {
-            this._height = Number(val);
-            
-            if(this._height < 0){ this._height = 0; }
+            this._scaleY = this._height / val;
+        });
+        
+        /**
+         * The scale x of the object
+         * @private
+         * @default 1
+         * @type number
+         */
+        this._scaleX = 1;
+        
+        /**
+         * Getter scaleX
+         * @returns {number} _scaleX
+         */
+        this.__defineGetter__("scaleX", function(){
+            return this._scaleX;
+        });
+        
+        /**
+         * Setter scaleX
+         */
+        this.__defineSetter__("scaleX", function(val)
+        {
+            this._scaleX = Number(val);
+        });
+        
+        
+        /**
+         * The scale y of the object
+         * @private
+         * @default 1
+         * @type number
+         */
+        this._scaleY = 1;
+        
+        /**
+         * Getter scaleY
+         * @returns {number} _scaleY
+         */
+        this.__defineGetter__("scaleY", function(){
+            return this._scaleY;
+        });
+        
+        /**
+         * Setter scaleY
+         */
+        this.__defineSetter__("scaleY", function(val)
+        {
+            this._scaleY = Number(val);
         });
         
         /**
@@ -246,6 +291,41 @@ aj.DisplayObject = aj.EventDispatcher.extend(
     },
     
     /**
+     * Get the scale for render
+     * @private
+     * @param {string} type The type {x,y}
+     * @returns {number} The computed scale
+     */
+    getComputedScale : function(type)
+    {
+    	var parent = this;
+    	var computedScale = 1;
+    	
+    	if(type == "x")
+    	{
+    		while(parent != this.stage || !parent)
+            {
+                computedScale *= parent.scaleX;
+                parent = parent.parent;
+            }
+    	}
+    	else if(type == "y")
+    	{
+    		while(parent != this.stage || !parent)
+            {
+                computedScale *= parent.scaleY;
+                parent = parent.parent;
+            }
+    	}
+    	else
+    	{
+    		return false;
+    	}
+    	
+    	return computedScale;
+    },
+    
+    /**
      * Convert a point from local coords to stage coords
      * @public
      * @param {aj.Point} [localPoint=DisplayObject#getCoordPoint] The local point
@@ -328,6 +408,17 @@ aj.DisplayObject = aj.EventDispatcher.extend(
         
         return false;
     },
+
+	/**
+	 * Dispatch the enter frame event
+	 * @protected
+	 * @param {aj.Event} enterFrameEvent The enter frame event
+	 * @returns {void}
+	 */
+	dispatchEnterFrame : function(enterFrameEvent)
+	{
+		this.dispatchEvent(enterFrameEvent);
+	},
     
     /**
      * Draw the object on the stage
@@ -469,6 +560,61 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
         this.__defineGetter__("numChildren", function(){
             return this.children.length;
         });
+
+
+
+
+		/**
+         * Getter width
+         * @returns {number} _width
+         */
+        this.__defineGetter__("width", function(){
+			var minX = 0, maxX = 0, tMinX = 0, tMaxX = 0;
+			for(var i=0,il=this.numChildren;i<il;i++)
+			{
+				tMinX = this.children[i].x;
+				tMaxX = this.children[i].x + this.children[i].width;
+				
+				minX = tMinX < minX ? tMinX : minX;
+				maxX = tMaxX > maxX ? tMaxX : maxX;
+			}
+            return (maxX - minX) * this._scaleX;
+        });
+        
+        /**
+         * Setter width
+         */
+        this.__defineSetter__("width", function(val)
+        {
+            this._scaleX = this.width / val;
+        });
+
+
+        
+        /**
+         * Getter height
+         * @returns {number} _height
+         */
+        this.__defineGetter__("height", function(){
+            var minY = 0, maxY = 0, tMinY = 0, tMaxY = 0;
+			for(var i=0,il=this.numChildren;i<il;i++)
+			{
+				tMinY = this.children[i].y;
+				tMaxY = this.children[i].y + this.children[i].height;
+				
+				minY = tMinY < minY ? tMinY : minY;
+				maxY = tMaxY > maxY ? tMaxY : maxY;
+			}
+            return (maxY - minY) * this._scaleY;
+        });
+        
+        /**
+         * Setter height
+         */
+        this.__defineSetter__("height", function(val)
+        {
+            this._scaleY = this.height / val;
+        });
     },
     
     /**
@@ -506,8 +652,11 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
     {
         child._stage = this.stage;
         
-        //Ajout dans la map
+        //Add in the map
         this.stage.addToMap(child);
+
+		//Dispatch the ADDED_TO_STAGE event
+		child.dispatchEvent(new aj.Event(aj.Event.ADDED_TO_STAGE));
         
         //If children, we forward
         if(child instanceof aj.DisplayObjectContainer)
@@ -643,8 +792,7 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
             if(this.children[i] == child)
             {
                 this.children.splice(i, 1);
-                this.jqEl.remove(child.jqEl);
-                child.stage = null;
+                child._stage = null;
             }
         }
         
@@ -715,6 +863,25 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
         
         return false;
     },
+
+	/**
+	 * Dispatch the enter frame event
+	 * @protected
+	 * @param {aj.Event} enterFrameEvent The enter frame event
+	 * @returns {void}
+	 */
+	dispatchEnterFrame : function(enterFrameEvent)
+	{
+		this._super(enterFrameEvent);
+		
+		for (var i=0, il=this.children.length; i<il; i++)
+        {
+			if(this.children[i] instanceof aj.DisplayObject)
+			{
+				this.children[i].dispatchEnterFrame(enterFrameEvent);
+			}
+		}
+	},
     
     /**
      * The draw method extend
@@ -753,6 +920,52 @@ aj.Stage = aj.DisplayObjectContainer.extend(
     init : function(stageId, fps)
     {
         this._super();
+
+		/**
+         * The width of the object
+         * @private
+         * @type number
+         */
+        this._width = 500;
+        
+        /**
+         * Getter width
+         * @returns {number} _width
+         */
+        this.__defineGetter__("width", function(){
+            return this._width;
+        });
+        
+        /**
+         * Setter width
+         */
+        this.__defineSetter__("width", function(val)
+        {
+        });
+        
+        
+        /**
+         * The height of the object
+         * @private
+         * @default 0
+         * @type number
+         */
+        this._height = 500;
+        
+        /**
+         * Getter height
+         * @returns {number} _height
+         */
+        this.__defineGetter__("height", function(){
+            return this._height;
+        });
+        
+        /**
+         * Setter height
+         */
+        this.__defineSetter__("height", function(val)
+        {
+        });
         
         /**
          * The jQuery element
@@ -761,9 +974,10 @@ aj.Stage = aj.DisplayObjectContainer.extend(
          */
         this.jqEl = null;
         
-        var canvas = '<canvas id="' + stageId + '" height="500" width="500"></canvas>';
+        var canvas = '<canvas id="' + stageId + '" width="' + this._width + '" height="' + this._height + '"></canvas>';
         
         this.jqEl = jQuery(canvas);
+
         
         /**
          * The 2D context of the canvas
@@ -870,7 +1084,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         
         
         this.name = stageId;
-        this.parent = 'basepage';
+        this._parent = 'basepage';
         this._stage = this;
         
         this.jqEl[0].addEventListener("click", jQuery.proxy(this.clickListener, this), false);
@@ -881,11 +1095,11 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         //this.jqEl.css("border", "1px solid #000");
         this.jqEl.css("font-size", "1px");
         this.jqEl.css("border", "1px solid #000");
-        this.jqEl.attr("contentEditable", "true");
+        //this.jqEl.attr("contentEditable", "true");
     },
     
     /**
-     * Ajout dans ma map
+     * Add to the map
      * @param {DisplayObject} child The child
      * @returns {void}
      */
@@ -960,7 +1174,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
     enterFrame : function()
     {
         var event = new aj.Event(aj.Event.ENTER_FRAME);
-        this.dispatchEvent(event);
+		this.dispatchEnterFrame(event);
     
         this.context2D.save();
         this.context2D.clearRect(0,0, 500, 500);
@@ -1014,7 +1228,6 @@ aj.Stage = aj.DisplayObjectContainer.extend(
      */
     start : function()
     {
-        console.log("start");
         this.library.removeEventListener(aj.Event.COMPLETE, this.start);
         this.initEnterFrame();
     },
@@ -1058,6 +1271,8 @@ aj.Image = aj.DisplayObject.extend(
          * @type Image
          */
         this.image = image;
+        this._height = image.height;
+        this._width = image.width;
     },
     
     /**
@@ -1069,7 +1284,9 @@ aj.Image = aj.DisplayObject.extend(
         
         if(this.image != null)
         {
-            this.stage.context2D.drawImage(this.image, globalPoint.x, globalPoint.y);
+        	var scaleX = this.getComputedScale("x");
+        	var scaleY = this.getComputedScale("y");
+            this.stage.context2D.drawImage(this.image, 0, 0, this.image.width, this.image.height, globalPoint.x, globalPoint.y, this.image.width * scaleX, this.image.height * scaleY);
         }
     }
 });
