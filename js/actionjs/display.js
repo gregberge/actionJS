@@ -874,7 +874,7 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
 	{
 		this._super(enterFrameEvent);
 		
-		for (var i=0, il=this.children.length; i<il; i++)
+		for (var i=this.children.length - 1; i>=0; i--)
         {
 			if(this.children[i] instanceof aj.DisplayObject)
 			{

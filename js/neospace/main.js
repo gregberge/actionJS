@@ -39,8 +39,16 @@ NS.Main = Class.extend({
 		this.plane = new NS.Plane();
 		this.stage.addChild(this.plane);
 		
+		var plane2 = new NS.Plane();
+		this.stage.addChild(plane2);
+		plane2.x -= 30;
+		
+		var plane3 = new NS.Plane();
+		this.stage.addChild(plane3);
+		plane3.x -= 60;
+		
 		var plane;
-		for(var i=0; i<30; i++)
+		for(var i=0; i<0; i++)
 		{
 			plane = new NS.Plane();
 			this.stage.addChild(plane);
