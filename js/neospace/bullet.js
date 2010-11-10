@@ -34,7 +34,12 @@ NS.Bullet = aj.DisplayObjectContainer.extend(
 		this.x =  x;
 		this.y = y;
 		
+		this.width = 5;
+		this.height = 5;
+		
 		this.addEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		
+		NS.Bullet.arBullets.push(this);
 	},
 	
 	/**
@@ -69,6 +74,21 @@ NS.Bullet = aj.DisplayObjectContainer.extend(
 		//Remove object
 		this.stage.removeChild(this);
 		
+		for(var i in NS.Bullet.arBullets)
+		{
+			if(NS.Bullet.arBullets[i] === this)
+			{
+				NS.Bullet.arBullets.splice(i, 1);
+			}
+		}
+		
 		delete this;
 	}
 });
+
+/**
+ * Bullets
+ * @static
+ * @public
+ */
+NS.Bullet.arBullets = [];

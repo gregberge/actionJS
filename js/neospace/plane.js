@@ -31,15 +31,6 @@ NS.Plane = aj.DisplayObjectContainer.extend(
 		
 		this.addEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
 		this.addEventListener(aj.Event.ADDED_TO_STAGE, $.proxy(this.onAddedToStage, this));
-		this.addEventListener(aj.MouseEvent.CLICK, $.proxy(this.onClick, this));
-	},
-	
-	/**
-	 * On click on the plane
-	 */
-	onClick : function()
-	{
-		alert('Click on ' + this.name);
 	},
 	
 	/**
@@ -82,7 +73,7 @@ NS.Plane = aj.DisplayObjectContainer.extend(
 	 */
 	shoot : function()
 	{
-		var bullet = new NS.Bullet(this.x, this.y);
+		var bullet = new NS.Bullet(this.x + 13, this.y);
 		this.stage.addChild(bullet);
 	},
 	

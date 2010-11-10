@@ -109,7 +109,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          */
         this.__defineSetter__("width", function(val)
         {
-            this._scaleX = this._width / val;
+            this._scaleX = val / this._width;
         });
         
         
@@ -134,7 +134,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
          */
         this.__defineSetter__("height", function(val)
         {
-            this._scaleY = this._height / val;
+            this._scaleY = val / this._height;
         });
         
         /**
@@ -378,6 +378,47 @@ aj.DisplayObject = aj.EventDispatcher.extend(
         
         return false;
     },
+
+	/**
+	 * Check if the objet hit an other
+	 * @public
+	 * @param {aj.DisplayObject} object The object to hit
+	 * @returns {boolean} true if the object hit the point, else false
+	 */
+	hitTest : function(object)
+	{
+		if(object instanceof aj.DisplayObject)
+		{
+			var tw = this.width;
+			var th = this.height;
+			var ow = object.width;
+			var oh = object.height;
+			
+			var tPoint = this.localToGlobal();
+			var oPoint = object.localToGlobal();
+		
+			var tx = tPoint.x;
+			var ty = tPoint.y;
+			var ox = oPoint.x;
+			var oy = oPoint.y;
+		
+			ow = ow + ox;
+			oh = oh + oy;
+			tw = tw + tx;
+			th = th + ty;
+		
+			if ((ow < ox || ow > tx) &&
+			(oh < oy || oh > ty) &&
+			(tw < tx || tw > ox) &&
+			(th < ty || th > oy)) {
+			return true;
+			}
+			
+			return false;
+		}
+		
+		return false;
+	},
     
     /**
      * The mouse test call at mouse action on the stage
@@ -586,7 +627,7 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
          */
         this.__defineSetter__("width", function(val)
         {
-            this._scaleX = this.width / val;
+            this._scaleX = val / this.width;
         });
 
 
@@ -613,7 +654,7 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
          */
         this.__defineSetter__("height", function(val)
         {
-            this._scaleY = this.height / val;
+            this._scaleY = val / this.height;
         });
     },
     
@@ -1229,6 +1270,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
     start : function()
     {
         this.library.removeEventListener(aj.Event.COMPLETE, this.start);
+		this.dispatchEvent(new aj.Event(aj.Event.COMPLETE));
         this.initEnterFrame();
     },
     
@@ -1243,7 +1285,15 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         this.context2D.font = 'normal 12px sans-serif';
         this.context2D.textBaseline = 'top';
         this.context2D.fillText("Fps: " + this.trueFps + " / " + this.fps, 0, 0);
-    }
+    },
+
+    /**
+     * Stop all events
+     */
+	stop : function()
+	{
+		clearInterval(this.enterFrameInterval);
+	}
 });
 
 
