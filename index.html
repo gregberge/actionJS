@@ -39,15 +39,66 @@
 		float: left;
 		margin: 0 10px 10px 0;
 	}
+	
+	#compare ul{
+		float: left;
+		width: 250px;
+	}
+	
+	.comparator{
+		float: left;
+		width: 300px;
+		margin: 0 10px;
+	}
+	
+	.comparator code{
+		display: block;
+		height: 300px;
+		overflow: auto;
+		font-size: 10px;
+	}
+	
+	.clear{
+		height: 0;
+		font-size: 0;
+		line-height: 0;
+		display: block;
+		clear: both;
+	}
 	</style>
 </head>
-<body> 
+<body>
 <script type="text/javascript">
 //Start the game
 new NS.Main();
 
 //Include the flash
 swfobject.embedSWF("swf/neospace.swf", "neospace-swf", "502", "502", "9.0.0");
+
+
+//Page
+
+function nl2br (str)
+{
+    var breakTag = '<br/>';
+	str = (str + '').replace(/([^>\t]?)(\t)/g, '$1'+ '&nbsp;&nbsp;&nbsp;' +'$2');
+    return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+}
+
+$(function()
+{
+	$('#compare ul a').click(function()
+	{
+		var name = $(this).html();
+		$('#comparator-js h3').html(name + '.js');
+		$.get('js/neospace/' + name + '.js', null, function(data){ $('#comparator-js code').html(nl2br(data)); }, 'text');
+		$('#comparator-as h3').html(name + '.as');
+		$.get('as3/' + name + '.as', null, function(data){ $('#comparator-as code').html(nl2br(data)); }, 'text');
+	 	return false;
+	});
+	
+	$('#compare ul a').eq(0).click();
+});
 </script>
 <h1>ActionJS Preview</h1>
 
@@ -66,12 +117,12 @@ swfobject.embedSWF("swf/neospace.swf", "neospace-swf", "502", "502", "9.0.0");
 		<h3>Main.js</h3>
 		<code>Hello world</code>
 	</div>
-	<div class="comparator" id="comparator-as3">
+	<div class="comparator" id="comparator-as">
 		<h3>Main.as3</h3>
-		<code>Hello world </code>
+		<code>Hello world</code>
 	</div>
 </div>
-
+<span class="clear"></span>
 <div class="game">
 	<h2>ActionJS Game</h2>
 	<div id="neospace-aj"></div>
