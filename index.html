@@ -2,66 +2,65 @@
  
 <html lang="fr"> 
 <head> 
-  <meta charset="UTF-8"> 
-  <title>Action JS</title> 
-  <script type="text/javascript" src="jquery.min.js?1"></script> 
-  <script type="text/javascript" src="js/actionjs/core.js?1"></script> 
-  <script type="text/javascript" src="js/actionjs/event.js?1"></script> 
-  <script type="text/javascript" src="js/actionjs/geom.js?1"></script>
-  <script type="text/javascript" src="js/actionjs/key.js?1"></script> 
-  <script type="text/javascript" src="js/actionjs/lib.js?1"></script>
-  <script type="text/javascript" src="js/actionjs/display.js?1"></script>
+	<meta charset="UTF-8"> 
+	<title>Action JS</title> 
+	<script type="text/javascript" src="js/jquery/jquery.min.js?1"></script> 
+	<script type="text/javascript" src="js/actionjs/core.js?1"></script> 
+	<script type="text/javascript" src="js/actionjs/event.js?1"></script> 
+	<script type="text/javascript" src="js/actionjs/geom.js?1"></script>
+	<script type="text/javascript" src="js/actionjs/key.js?1"></script> 
+	<script type="text/javascript" src="js/actionjs/lib.js?1"></script>
+	<script type="text/javascript" src="js/actionjs/display.js?1"></script>
+	<script type="text/javascript" src="js/neospace/main.js?1"></script>
+	<script type="text/javascript" src="js/neospace/plane.js?1"></script>
+	<script type="text/javascript" src="js/neospace/bullet.js?1"></script>
+	<script type="text/javascript" src="js/neospace/enemy.js?1"></script>	
+	<script type="text/javascript" src="js/swfobject/swfobject.min.js?1"></script>
+	
+	<style type="text/css">
+	html, body{
+		margin: 10px;
+		font-family: "Lucida Grande", Arial;
+	}
+	
+	h1{
+		font-size: 24px;
+	}
+	
+	h2{
+		font-size: 16px;
+	}
+	
+	#neospace-swf, #neospace-aj{
+		border: 1px solid #000;
+	}
+	
+	.game{
+		float: left;
+		margin: 0 10px 10px 0;
+	}
+	</style>
 </head>
 <body> 
 <script type="text/javascript">
-//Create stage
-var stage = new aj.Stage("game");
+//Start the game
+new NS.Main();
 
-//Add image in lib
-stage.library.addImage("fox", "http://forums.mozillazine.org/download/file.php?avatar=102068_1242996847.png");
+//Include the flash
+swfobject.embedSWF("swf/neospace.swf", "neospace-swf", "502", "502", "9.0.0");
+</script>
+<h1>ActionJS Preview</h1>
 
-//Create image
-var imageObject = new aj.Image(stage.library.get("fox"));
-imageObject.height = 50;
-imageObject.width = 50;
-imageObject.x = 20;
-imageObject.speed = 2;
-imageObject.alpha = 0.5;
+<p>Here, you can see a preview of actionJS power, two same game, one in actionJS, the other in flash, the two games are the same.</p>
+<p>To start, click in a game, you can move with the arrow, and shoot with space key.</p>
 
-//Create displayObjectContainer
-var displayObjectContainer = new aj.DisplayObjectContainer();
-displayObjectContainer.addChild(imageObject);
-
-stage.addChild(displayObjectContainer);
-
-
-//EnterFrame
-function onEnterFrame(event)
-{
-   imageObject.x += 1;
-};
-
-function onClick(event)
-{
-	console.log(event);
-};
-
-stage.addEventListener(aj.Event.ENTER_FRAME, onEnterFrame);
-
-imageObject.addEventListener(aj.MouseEvent.CLICK, onClick);
-displayObjectContainer.addEventListener(aj.MouseEvent.CLICK, onClick);
-
-function onProgress(event)
-{
-   $("#loading").html(((event.loaded / event.total)*100) + "%");
-};
-
-stage.library.addEventListener(aj.ProgressEvent.PROGRESS, onProgress);
-
-stage.load();
-
-stage.showFps = true;
-</script> 
-<div id="loading"></div>
+<div class="game">
+	<h2>ActionJS Game</h2>
+	<div id="neospace-aj"></div>
+</div>
+<div class="game">
+	<h2>Flash Game</h2>
+	<div id="neospace-swf"></div>
+</div>
 </body> 
 </html>
