@@ -37,7 +37,7 @@ NS.Bullet = aj.Sprite.extend(
 		this.width = 5;
 		this.height = 5;
 		
-		this.addEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		this.addEventListener(aj.Event.ENTER_FRAME, this.onEnterFrame, this);
 		
 		NS.Bullet.arBullets.push(this);
 	},
@@ -69,7 +69,7 @@ NS.Bullet = aj.Sprite.extend(
 	dispose : function()
 	{
 		//Remove events
-		this.removeEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		this.removeEventListener(aj.Event.ENTER_FRAME, this.onEnterFrame, this);
 		
 		//Remove object
 		this.stage.removeChild(this);

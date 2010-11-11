@@ -212,13 +212,14 @@ aj.EventDispatcher = Class.extend(
      * @public
      * @param {string} type Event type
      * @param {function} listener The function to call
+	 * @param {object} proxy The proxy
      * @returns {boolean} true if added, else false
      */
-    addEventListener : function(type, listener)
+    addEventListener : function(type, listener, proxy)
     {
         if(typeof type != "undefined" && typeof listener == "function")
         {
-            var eventListener = [type, listener];
+            var eventListener = [type, listener, proxy];
             this.eventListenerList.push(eventListener);
             return true;
         }
@@ -240,10 +241,17 @@ aj.EventDispatcher = Class.extend(
             {
                 var eventListener = this.eventListenerList[i];
                 
-                if(eventListener[0] && eventListener[0] == event.type)
+                if(typeof eventListener != "undefined" && eventListener[0] && eventListener[0] == event.type)
                 {
                     event.target = this;
-                    eventListener[1].call(this, event);
+					var fn = eventListener[1];
+
+					if(eventListener[2] != null)
+					{
+						fn = $.proxy(eventListener[1], eventListener[2]);
+					}
+					
+                    fn.call(this, event);
                 }
             }
             
@@ -278,9 +286,10 @@ aj.EventDispatcher = Class.extend(
      * Remove a event listener
      * @param {string} type Event type
      * @param {function} listener The event listener
+	 * @param {object} proxy The proxy
      * @return {boolean} true if the listener was removed, else false
      */
-    removeEventListener : function(type, listener)
+    removeEventListener : function(type, listener, proxy)
     {
         var removed = false;
 
@@ -288,7 +297,7 @@ aj.EventDispatcher = Class.extend(
         {
              var eventListener = this.eventListenerList[i];
             
-             if(eventListener[0] && eventListener[0] == type && eventListener[1] && eventListener[1] == listener)
+             if(typeof eventListener != "undefined" && eventListener[0] && eventListener[0] == type && eventListener[1] && eventListener[1] == listener && (typeof eventListener[2] == "undefined" || typeof proxy == "undefined" || eventListener[2] == proxy))
              {
                  this.eventListenerList.splice(i, 1);
                  removed = true;

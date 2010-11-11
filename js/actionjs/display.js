@@ -1149,10 +1149,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         this.jqEl.css("outline", "none");
         this.jqEl.css("left", "100px");
         this.jqEl.css("top", "100px");
-        //this.jqEl.css("border", "1px solid #000");
         this.jqEl.css("font-size", "1px");
-        this.jqEl.css("border", "1px solid #000");
-        //this.jqEl.attr("contentEditable", "true");
     },
     
     /**
@@ -1197,6 +1194,8 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         var mouseEvent = new aj.MouseEvent(aj.MouseEvent.CLICK);
         
         var point = new aj.Point(event.clientX - this.jqEl.get(0).offsetLeft, event.clientY - this.jqEl.get(0).offsetTop);
+
+		this.dispatchEvent(mouseEvent);
         
         this.sortMap();
         
@@ -1272,10 +1271,21 @@ aj.Stage = aj.DisplayObjectContainer.extend(
      */
     load : function()
     {
-        $('body').append(this.jqEl);
-        
-        this.library.addEventListener(aj.Event.COMPLETE, jQuery.proxy(this.start, this));
-        this.library.load();
+		$($.proxy(function()
+		{
+			var previousDiv = $('#' + this.jqEl.attr('id')).eq(0);
+
+			if($('#' + this.jqEl.attr('id')).length)
+			{
+				previousDiv.attr('id', 'temp-' + this.jqEl.attr('id'));
+				this.jqEl.insertBefore(previousDiv);
+				previousDiv.remove();
+			}
+
+			this.library.addEventListener(aj.Event.COMPLETE, jQuery.proxy(this.start, this));
+			this.library.load();
+
+		}, this));
     },
     
     /**

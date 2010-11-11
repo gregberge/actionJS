@@ -35,22 +35,50 @@ NS.Main = Class.extend({
 	gameEnd : false,
 	
 	/**
+	 * End of loading
+	 * @type boolean
+	 */
+	loadingEnd : false,
+	
+	/**
+	 * Start of game
+	 * @type boolean
+	 */
+	gameStart : false,
+	
+	
+	/**
 	 * Constructor
 	 */
 	init : function()
 	{
-		this.stage = new aj.Stage("neospace");
+		this.stage = new aj.Stage("neospace-aj");
 		this.stage.library.addImage("plane", "http://asset1.rentability.com/images/transport/plane.png");
 		this.stage.library.addImage("bullet", "http://www.cs.utk.edu/~berry/Bullets/orange-bullet.gif");
 		this.stage.library.addImage("meteorite", "http://www.sail.enxt.net/cleanup/Tech/GameMaker/Sprites/Space/meteorite_medium2.png");
 		
-		this.stage.addEventListener(aj.Event.COMPLETE, $.proxy(this.start, this));
+		this.stage.addEventListener(aj.Event.COMPLETE, this.finishLoading, this);
+		this.stage.addEventListener(aj.MouseEvent.CLICK, this.start, this);
+		
+		this.stage.showFps = true;
 		
 		this.stage.load();
-		this.stage.showFps = true;
 		
 		NS.Main.stage = this.stage;
 		NS.Main.main = this;
+	},
+	
+	/**
+	 * Finish the loading
+	 */
+	finishLoading : function()
+	{
+		this.loadingEnd = true;
+		
+		if(this.gameStart)
+		{
+			this.start();
+		}
 	},
 	
 	/**
@@ -58,10 +86,16 @@ NS.Main = Class.extend({
 	 */
 	start : function()
 	{
-		this.plane = new NS.Plane();
-		this.stage.addChild(this.plane);
+		this.stage.removeEventListener(aj.MouseEvent.CLICK, this.start, this);
+		this.gameStart = true;
 		
-		this.enemyInterval = setInterval($.proxy(this.addEnemy, this), 500);
+		if(this.loadingEnd)
+		{
+			this.plane = new NS.Plane();
+			this.stage.addChild(this.plane);
+		
+			this.enemyInterval = setInterval($.proxy(this.addEnemy, this), 500);
+		}
 	},
 	
 	/**

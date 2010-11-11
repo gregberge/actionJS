@@ -29,8 +29,8 @@ NS.Plane = aj.Sprite.extend(
 		var img = new aj.Image(NS.Main.stage.library.get("plane"));
 		this.addChild(img);
 		
-		this.addEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
-		this.addEventListener(aj.Event.ADDED_TO_STAGE, $.proxy(this.onAddedToStage, this));
+		this.addEventListener(aj.Event.ENTER_FRAME, this.onEnterFrame, this);
+		this.addEventListener(aj.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 	},
 	
 	/**
@@ -39,12 +39,12 @@ NS.Plane = aj.Sprite.extend(
 	 */
 	onAddedToStage : function()
 	{
-		this.removeEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		this.removeEventListener(aj.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 		
 		this.x = this.stage.width / 2 - this.width / 2;
 		this.y = 300;
 		
-		this.stage.addEventListener(aj.KeyboardEvent.KEY_DOWN, $.proxy(this.onKeyDown, this));
+		this.stage.addEventListener(aj.KeyboardEvent.KEY_DOWN, this.onKeyDown, this);
 	},
 	
 	/**
@@ -114,8 +114,8 @@ NS.Plane = aj.Sprite.extend(
 	 */
 	dispose : function()
 	{
-		this.removeEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
-		this.stage.removeEventListener(aj.KeyboardEvent.KEY_DOWN, $.proxy(this.onKeyDown, this));
+		this.removeEventListener(aj.Event.ENTER_FRAME, this.onEnterFrame, this);
+		this.stage.removeEventListener(aj.KeyboardEvent.KEY_DOWN, this.onKeyDown, this);
 		
 		this.parent.removeChild(this);
 	}
