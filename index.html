@@ -47,7 +47,7 @@
 	
 	.comparator{
 		float: left;
-		width: 300px;
+		width: 400px;
 		margin: 0 10px;
 	}
 	
@@ -55,7 +55,7 @@
 		display: block;
 		height: 300px;
 		overflow: auto;
-		font-size: 10px;
+		font-size: 12px;
 	}
 	
 	.clear{
@@ -90,8 +90,8 @@ $(function()
 	$('#compare ul a').click(function()
 	{
 		var name = $(this).html();
-		$('#comparator-js h3').html(name + '.js');
-		$.get('js/neospace/' + name + '.js', null, function(data){ $('#comparator-js code').html(nl2br(data)); }, 'text');
+		$('#comparator-js h3').html(name.toLowerCase() + '.js');
+		$.get('js/neospace/' + name.toLowerCase() + '.js', null, function(data){ $('#comparator-js code').html(nl2br(data)); }, 'text');
 		$('#comparator-as h3').html(name + '.as');
 		$.get('as3/' + name + '.as', null, function(data){ $('#comparator-as code').html(nl2br(data)); }, 'text');
 	 	return false;
@@ -115,10 +115,12 @@ $(function()
 	</ul>
 	<div class="comparator" id="comparator-js">
 		<h3>Main.js</h3>
+		<p><a href="" onclick="window.open(this.target); return false;">View on github</a></p>
 		<code>Hello world</code>
 	</div>
 	<div class="comparator" id="comparator-as">
 		<h3>Main.as3</h3>
+		<p><a href="" onclick="window.open(this.target); return false;">View on github</a></p>
 		<code>Hello world</code>
 	</div>
 </div>
