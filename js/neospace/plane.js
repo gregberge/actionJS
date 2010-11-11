@@ -12,7 +12,7 @@ if(typeof NS == "undefined")
  * The plane
  * @class Plane
  */
-NS.Plane = aj.DisplayObjectContainer.extend(
+NS.Plane = aj.Sprite.extend(
 {
 	/**
 	 * The plane's speed
@@ -39,6 +39,8 @@ NS.Plane = aj.DisplayObjectContainer.extend(
 	 */
 	onAddedToStage : function()
 	{
+		this.removeEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		
 		this.x = this.stage.width / 2 - this.width / 2;
 		this.y = 300;
 		
@@ -78,7 +80,7 @@ NS.Plane = aj.DisplayObjectContainer.extend(
 	},
 	
 	/**
-	 * The key manager call on enter frame
+	 * The key manager called on enter frame
 	 * @private
 	 */
 	keyManager : function()
@@ -104,6 +106,18 @@ NS.Plane = aj.DisplayObjectContainer.extend(
 		{
 			this.y -= this._speed;
 		}
+	},
+	
+	/**
+	 * Remove completely the object
+	 * @public
+	 */
+	dispose : function()
+	{
+		this.removeEventListener(aj.Event.ENTER_FRAME, $.proxy(this.onEnterFrame, this));
+		this.stage.removeEventListener(aj.KeyboardEvent.KEY_DOWN, $.proxy(this.onKeyDown, this));
+		
+		this.parent.removeChild(this);
 	}
 	
 });

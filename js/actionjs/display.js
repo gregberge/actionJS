@@ -385,7 +385,7 @@ aj.DisplayObject = aj.EventDispatcher.extend(
 	 * @param {aj.DisplayObject} object The object to hit
 	 * @returns {boolean} true if the object hit the point, else false
 	 */
-	hitTest : function(object)
+	hitTestObject : function(object)
 	{
 		if(object instanceof aj.DisplayObject)
 		{
@@ -944,6 +944,22 @@ aj.DisplayObjectContainer = aj.DisplayObject.extend(
 
 });
 
+/**
+ * Sprite
+ * @extends aj.DisplayObjectContainer
+ * @class Represent the base class container
+ */
+aj.Sprite = aj.DisplayObjectContainer.extend(
+{
+	/**
+	 * Constructor
+	 */
+	init : function()
+	{
+		this._super();
+	}
+});
+
 
 /**
  * Stage
@@ -1015,7 +1031,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
          */
         this.jqEl = null;
         
-        var canvas = '<canvas id="' + stageId + '" width="' + this._width + '" height="' + this._height + '"></canvas>';
+        var canvas = '<canvas id="' + stageId + '" width="' + this._width + '" height="' + this._height + '" tabIndex="1"></canvas>';
         
         this.jqEl = jQuery(canvas);
 

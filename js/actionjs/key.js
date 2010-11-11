@@ -28,12 +28,21 @@ aj.Key = Class.extend(
         this.keysDown = [];
         this.stage = stage;
 
-        //this.stage.jqEl[0].onkeydown = jQuery.proxy(this.keyDownListener, this);
-        //this.stage.jqEl[0].onkeyup = jQuery.proxy(this.keyUpListener, this);
+		this.stage.jqEl.focusin($.proxy(this.onFocusIn, this));
+		this.stage.jqEl.focusout($.proxy(this.onFocusOut, this));
+    },
 
+	onFocusIn : function()
+	{
 		document.onkeydown = jQuery.proxy(this.keyDownListener, this);
         document.onkeyup = jQuery.proxy(this.keyUpListener, this);
-    },
+	},
+	
+	onFocusOut : function()
+	{
+		document.onkeydown = null;
+        document.onkeyup = null;
+	},
     
     /**
      * The listener of the event onkeydown

@@ -23,6 +23,18 @@ NS.Main = Class.extend({
 	plane : null,
 	
 	/**
+	 * Interval enemy
+	 * @type int
+     */
+	enemyInterval : null,
+	
+	/**
+	 * End of game
+	 * @type boolean
+	 */
+	gameEnd : false,
+	
+	/**
 	 * Constructor
 	 */
 	init : function()
@@ -49,19 +61,26 @@ NS.Main = Class.extend({
 		this.plane = new NS.Plane();
 		this.stage.addChild(this.plane);
 		
-		setInterval($.proxy(this.addEnnemy, this), 500);
+		this.enemyInterval = setInterval($.proxy(this.addEnemy, this), 500);
 	},
 	
+	/**
+	 * Finish
+	 */
 	finish : function()
 	{
-		this.stage.stop();
-		alert("Game over");
+		if(!this.gameEnd)
+		{
+			this.gameEnd = true;
+			this.plane.dispose();
+			clearInterval(this.enemyInterval);
+		}
 	},
 	
 	/**
 	 * Add enemy on the scene
 	 */
-	addEnnemy : function()
+	addEnemy : function()
 	{
 		var enemy = new NS.Enemy();
 		this.stage.addChild(enemy);

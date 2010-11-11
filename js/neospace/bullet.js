@@ -12,7 +12,7 @@ if(typeof NS == "undefined")
  * A simple bullet
  * @class Bullet
  */
-NS.Bullet = aj.DisplayObjectContainer.extend(
+NS.Bullet = aj.Sprite.extend(
 {
 	/**
 	 * The bullet's speed
