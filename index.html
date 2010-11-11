@@ -51,6 +51,11 @@
 		margin: 0 10px;
 	}
 	
+	.comparator p{
+		font-size: 12px;
+		font-weight: bold;
+	}
+	
 	.comparator code{
 		display: block;
 		height: 300px;
@@ -92,8 +97,11 @@ $(function()
 		var name = $(this).html();
 		$('#comparator-js h3').html(name.toLowerCase() + '.js');
 		$.get('js/neospace/' + name.toLowerCase() + '.js', null, function(data){ $('#comparator-js code').html(nl2br(data)); }, 'text');
+		$('#comparator-js p a').attr('href', 'https://github.com/neoziro/actionJS/blob/master/js/neospace/' + name.toLowerCase() + '.js');
+		
 		$('#comparator-as h3').html(name + '.as');
 		$.get('as3/' + name + '.as', null, function(data){ $('#comparator-as code').html(nl2br(data)); }, 'text');
+		$('#comparator-as p a').attr('href', 'https://github.com/neoziro/actionJS/blob/master/as3/' + name + '.as');
 	 	return false;
 	});
 	
@@ -104,6 +112,7 @@ $(function()
 
 <p>Here, you can see a preview of actionJS power, two same game, one in actionJS, the other in flash, the two games are the same.</p>
 <p>To start, click in a game, you can move with the arrow, and shoot with space key.</p>
+<p>You can checkout the project <a href="https://github.com/neoziro/actionJS">on github</a>, or contact me via <a href="http://www.neoziro.com">my website</a>.</p>
 
 <h2>Compare the classes</h2>
 <div id="compare">
@@ -115,12 +124,12 @@ $(function()
 	</ul>
 	<div class="comparator" id="comparator-js">
 		<h3>Main.js</h3>
-		<p><a href="" onclick="window.open(this.target); return false;">View on github</a></p>
+		<p><a href="" onclick="window.open(this.href); return false;">View on github</a></p>
 		<code>Hello world</code>
 	</div>
 	<div class="comparator" id="comparator-as">
 		<h3>Main.as3</h3>
-		<p><a href="" onclick="window.open(this.target); return false;">View on github</a></p>
+		<p><a href="" onclick="window.open(this.href); return false;">View on github</a></p>
 		<code>Hello world</code>
 	</div>
 </div>
