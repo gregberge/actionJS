@@ -1150,6 +1150,7 @@ aj.Stage = aj.DisplayObjectContainer.extend(
         this.jqEl.css("left", "100px");
         this.jqEl.css("top", "100px");
         this.jqEl.css("font-size", "1px");
+		this.jqEl.css("tabindex", "1");
     },
     
     /**

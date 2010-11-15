@@ -30,6 +30,8 @@ aj.Key = Class.extend(
 
 		this.stage.jqEl.focusin($.proxy(this.onFocusIn, this));
 		this.stage.jqEl.focusout($.proxy(this.onFocusOut, this));
+		document.onkeydown = jQuery.proxy(this.keyDownListener, this);
+        document.onkeyup = jQuery.proxy(this.keyUpListener, this);
     },
 
 	onFocusIn : function()
