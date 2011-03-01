@@ -55,7 +55,7 @@ NS.Main = Class.extend({
 		this.stage = new aj.Stage("neospace-aj");
 		this.stage.library.addImage("plane", "http://asset1.rentability.com/images/transport/plane.png");
 		this.stage.library.addImage("bullet", "http://www.cs.utk.edu/~berry/Bullets/orange-bullet.gif");
-		this.stage.library.addImage("meteorite", "http://www.sail.enxt.net/cleanup/Tech/GameMaker/Sprites/Space/meteorite_medium2.png");
+		this.stage.library.addImage("meteorite", "http://t2.gstatic.com/images?q=tbn:ANd9GcRsBbVEWV7WiKFv5bjyMrfVkOWGqfhHrcjftdtVEhbYwmF7QuvC&t=1");
 		
 		this.stage.addEventListener(aj.Event.COMPLETE, this.finishLoading, this);
 		this.stage.addEventListener(aj.MouseEvent.CLICK, this.start, this);
