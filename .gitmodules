@@ -1,3 +1,3 @@
-[submodule "lib/js.class"]
-	path = lib/js.class
-	url = git://github.com/jcoglan/js.class.git
+[submodule "lib/requirejs"]
+	path = lib/requirejs
+	url = git://github.com/jrburke/requirejs.git
