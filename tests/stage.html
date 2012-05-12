@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+   <title>ActionJS - Tests</title>
+   <script src="../lib/requirejs/require.js"></script>
+   <script src="../lib/actionjs/core.js"></script>
+   <script>
+   require.config({
+      baseUrl: "",
+      paths: {
+          "aj": "../lib/actionjs",
+          "jquery": "http://code.jquery.com/jquery-latest",
+          "qunit": "http://code.jquery.com/qunit/git/qunit",
+          "tests": "."
+      },
+      waitSeconds: 15
+   });
+   </script>
+   
+   <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
+</head>
+<body>
+<div id="stage"></div>
+<script>
+require(["aj/display/Stage"], function(Stage){
+   var stage = new Stage(300, 300);
+   stage.attachTo("stage");
+});
+</script>
+</body>
+</html>
