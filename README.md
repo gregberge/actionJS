@@ -1,3 +1,8 @@
+Credits
+-------
+- JS.Class : http://jsclass.jcoglan.com/modifyingmodules.html
+- require.js : http://requirejs.org/
+
 License
 -------
 
