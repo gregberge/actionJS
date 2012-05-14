@@ -11,8 +11,8 @@ define(["jquery", "qunit"], function($, qunit)
             test("aj/display/DisplayObject", function()
             {
                var displayObject = new DisplayObject();
-               displayObject.width = 20;
-               displayObject.height = 50;
+               displayObject._width = 20;
+               displayObject._height = 50;
                
                ok(displayObject instanceof DisplayObject, "instanciate");
                
@@ -25,9 +25,8 @@ define(["jquery", "qunit"], function($, qunit)
                equal(displayObject.localToGlobal(new Point(5, 10)).x, 5, "localToGlobal() x=5");
                equal(displayObject.localToGlobal(new Point(5, 10)).y, 10, "localToGlobal() y=10");
                
-               ok(displayObject.getRect(displayObject).equals(new Rectangle(5, 10, 0, 0)), "getRect()");
+               ok(displayObject.getRect(displayObject).equals(new Rectangle(5, 10, 20, 50)), "getRect()");
                
-               return ;
                equal(displayObject.globalToLocal(new Point(5, 10)).x, 5, "globalToLocal() x=5");
                equal(displayObject.globalToLocal(new Point(5, 10)).y, 10, "globalToLocal() y=10");
                
