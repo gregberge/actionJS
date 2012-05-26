@@ -46,6 +46,71 @@ define(["jquery", "qunit"], function($, qunit)
             });
          });
          
+         require(["aj/display/DisplayObjectContainer", "aj/display/DisplayObject", "aj/geom/Point"],
+         function(DisplayObjectContainer, DisplayObject, Point)
+         {
+            test("aj/display/DisplayObjectContainer", function()
+            {
+               var doc = new DisplayObjectContainer();
+               ok(doc instanceof DisplayObjectContainer, "instanciate");
+               
+               var child = new DisplayObject();
+               child.name = "child1";
+               var child2 = new DisplayObject();
+               child2.name = "child2";
+               
+               equal(doc.addChild(child), child, "addChild() return child");
+               equal(doc._children[0], child, "addChild() effective");
+               
+               ok(doc.contains(child), "contains() true");
+               equal(doc.contains(child2), false, "contains() false");
+               
+               equal(doc.addChildAt(child2, 0), child2, "addChildAt() return child");
+               equal(doc._children[0], child2, "addChildAt() effective");
+               
+               equal(doc.getChildAt(2), false, "getChildAt() false");
+               equal(doc.getChildAt(1), child, "getChildAt() effective");
+               
+               equal(doc.getChildIndex(child2), 0, "getChildIndex() effective");
+               
+               equal(doc.removeChild(child2), child2, "removeChild() return child");
+               equal(doc._children[0], child, "removeChild() effective");
+               
+               equal(doc.removeChildAt(0), child, "removeChildAt() return child");
+               equal(doc._children.length, 0, "removeChildAt() effective");
+               
+               doc.addChild(child);
+               
+               equal(doc.setChildIndex(child2, 0), false, "setChildIndex() false");
+               
+               doc.addChild(child2);
+               
+               equal(doc.setChildIndex(child2, 0), child2, "setChildIndex() return child");
+               equal(doc._children[0], child2, "setChildIndex() effective");
+               
+               doc.swapChildren(child, child2);
+               
+               equal(doc._children[0], child, "swapChildren() effective");
+               
+               doc.swapChildrenAt(1, 0);
+               
+               equal(doc._children[0], child, "swapChildrenAt() effective");
+               
+               var d1 = new DisplayObject();
+               d1._width = 20;
+               d1._height = 50;
+               
+               var pt = new Point(5, 5);
+               
+               doc.addChild(d1);
+               
+               var doc2 = new DisplayObjectContainer();
+               doc2.addChild(doc);
+               
+               equal(doc2.getObjectsUnderPoint(pt)[0], d1, "getObjectsUnderPoint effective")
+            });
+         });
+         
          require(["aj/display/Stage"], function(Stage)
          {
             test("aj/display/Stage", function()
