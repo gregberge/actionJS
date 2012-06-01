@@ -22,9 +22,31 @@
 <body>
 <div id="stage"></div>
 <script>
-require(["aj/display/Stage"], function(Stage){
-   var stage = new Stage(300, 300);
+imgK = new Image();
+imgK.src = "http://4.bp.blogspot.com/_aLeS4-qZYi4/TTteVB0GReI/AAAAAAAAABY/-C-nApLndzk/s45/paw-prints-clipart-cat-paws.gif";
+require(["aj/display/Stage", "aj/display/Sprite", "aj/events/Event"], function(Stage, Sprite, Event){
+   var stage = new Stage(1000, 300);
    stage.attachTo("stage");
+   
+   for(var i= 0; i < 40; i++)
+   {
+      var sprite = new Sprite();
+      sprite.graphics.fillRect(2, 3, 20, 20);
+      sprite.x = Math.random() * 100;
+      sprite.y = Math.random() * 100;
+      sprite.scaleX = 2;
+      
+      var onEnterFrame = function(e)
+      {
+         e.currentTarget.x += 1;
+      };
+      
+      sprite.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+      
+      stage.addChild(sprite);
+   }
+   
+   stage.start();
 });
 </script>
 </body>

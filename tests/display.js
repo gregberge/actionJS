@@ -46,8 +46,8 @@ define(["jquery", "qunit"], function($, qunit)
             });
          });
          
-         require(["aj/display/DisplayObjectContainer", "aj/display/DisplayObject", "aj/geom/Point"],
-         function(DisplayObjectContainer, DisplayObject, Point)
+         require(["aj/display/DisplayObjectContainer", "aj/display/DisplayObject", "aj/geom/Point", "aj/events/Event", "aj/display/Stage"],
+         function(DisplayObjectContainer, DisplayObject, Point, Event, Stage)
          {
             test("aj/display/DisplayObjectContainer", function()
             {
@@ -107,7 +107,32 @@ define(["jquery", "qunit"], function($, qunit)
                var doc2 = new DisplayObjectContainer();
                doc2.addChild(doc);
                
-               equal(doc2.getObjectsUnderPoint(pt)[0], d1, "getObjectsUnderPoint effective")
+               equal(doc2.getObjectsUnderPoint(pt)[0], d1, "getObjectsUnderPoint effective");
+            
+               var d1 = new DisplayObject(), d2 = new DisplayObjectContainer();
+               var added = false, added_to_stage = false, removed = false, removed_from_stage = false;
+               
+               d1.addEventListener(Event.ADDED, function(){added = true;});
+               d1.addEventListener(Event.ADDED_TO_STAGE, function(){added_to_stage = true;});
+               d1.addEventListener(Event.REMOVED, function(){removed = true;});
+               d1.addEventListener(Event.REMOVED_FROM_STAGE, function(){removed_from_stage = true;});
+               d2.addChild(d1);
+               
+               ok(added, "event 'added'");
+               
+               var stage = new Stage(300, 300);
+               
+               stage.addChild(d2);
+               
+               ok(added_to_stage, "event 'added_to_stage'");
+               
+               stage.removeChild(d2);
+               
+               ok(removed_from_stage, "event 'removed_from_stage'");
+               
+               d2.removeChild(d1);
+               
+               ok(removed, "event 'removed'");
             });
          });
          
