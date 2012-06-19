@@ -20,33 +20,57 @@
    <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
 </head>
 <body>
-<div id="stage"></div>
+<div id="stage" style="margin: 20px; border: 1px solid #000"></div>
 <script>
-imgK = new Image();
-imgK.src = "http://4.bp.blogspot.com/_aLeS4-qZYi4/TTteVB0GReI/AAAAAAAAABY/-C-nApLndzk/s45/paw-prints-clipart-cat-paws.gif";
-require(["aj/display/Stage", "aj/display/Sprite", "aj/events/Event"], function(Stage, Sprite, Event){
-   var stage = new Stage(1000, 300);
-   stage.attachTo("stage");
+require(["aj/display/Animation", "aj/display/Sprite", "aj/events/Event", "aj/events/MouseEvent"],
+      function(Animation, Sprite, Event, MouseEvent){
    
-   for(var i= 0; i < 40; i++)
+   var animation = new Animation(1000, 300);
+   animation.attachTo("stage");
+   animation.showFps();
+   animation.start();
+   
+   var stage = animation.stage;
+   
+   var sp = new Sprite();
+   
+   var onEnterFrame = function(e)
+   {
+      //console.log(e.currentTarget);
+      //e.currentTarget.x += 2;
+   };
+   
+   var onClick = function(e)
+   {
+      e.currentTarget.parent.removeChild(e.currentTarget);
+   };
+   
+   for(var i= 0; i < 10; i++)
    {
       var sprite = new Sprite();
-      sprite.graphics.fillRect(2, 3, 20, 20);
-      sprite.x = Math.random() * 100;
-      sprite.y = Math.random() * 100;
-      sprite.scaleX = 2;
-      
-      var onEnterFrame = function(e)
-      {
-         e.currentTarget.x += 1;
-      };
+      sprite.graphics.width = 10;
+      sprite.graphics.height = 10;
+      sprite.graphics.fillRect(0, 0, 10, 10);
+      sprite.x = Math.random() * 290;
+      sprite.y = Math.random() * 290;
+      sprite.name = "name" + i;
       
       sprite.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+      sprite.addEventListener(MouseEvent.CLICK, onClick);
       
-      stage.addChild(sprite);
+      sp.addChild(sprite);
    }
    
-   stage.start();
+   stage.addChild(sp);
+   
+   var sp2 = new Sprite();
+   sp2.graphics.height = 10;
+   sp2.graphics.width = 10;
+   sp2.graphics.fillRect(0, 0, 10, 10);
+   
+   sp2.x = sp2.y = 40;
+   
+   stage.addChild(sp2);
 });
 </script>
 </body>
